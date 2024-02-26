@@ -21,8 +21,11 @@ We also provide a .NET API Client written in C# to call our [REST API v2](https:
 
 This documentation is focused on the **iProov.NET.MAUI** package. There's nuget-specific documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.iOS/) packages.
 
-## iProov.NET.MAUI
+### Requirements
 
+- NET 8 (net8-android;net8-ios)
+- iOS 12 and above
+- Android API Level 21 (Android 5 Lollipop) and above
 
 
 ## Repository contents
@@ -30,18 +33,118 @@ This documentation is focused on the **iProov.NET.MAUI** package. There's nuget-
 The iProov Xamarin SDK is provided via this repository, which contains the following:
 
 - **README.md** - This document
-- **NuGet Packages** - Directory containing the NuGet packages for Xamarin.iOS & Xamarin.Android
+- **NuGet Packages** - Directory containing the NuGet packages for iProov.NET.Android, iProov.NET.iOS & iProov.NET.MAUI
 - **APIClient** - C# project with the source code for the .NET API Client
-- **Example** - Sample code demonstrating use of the Xamarin.iOS & Xamarin.Android bindings together with the .NET API Client
-
-## Upgrading from earlier versions
-
-If you're already using an older version of the Xamarin SDK, consult the [Upgrade Guide](https://github.com/iProov/xamarin/wiki/Upgrade-Guide) for detailed information about how to upgrade your app.
+- **ExampleAppMAUI** - Sample code demonstrating use of the iProov.NET.MAUI together with the .NET API Client
 
 ## Registration
 
 You can obtain API credentials by registering on the [iProov Partner Portal](https://www.iproov.net).
 
+
+# \<Temporary\> From flutter doc
+## Options
+
+The `Options` class allows iProov to be customized in various ways. These can be specified by passing the optional `options:` named parameter in `IProov.launch()`.
+
+Most of these options are common to both Android and iOS, however, some are Android-only.
+
+For full documentation, please read the respective [iOS](https://github.com/iProov/ios#options) and [Android](https://github.com/iProov/android#customize-the-user-experience) native SDK documentation.
+
+A summary of the support for the various SDK options in Flutter is provided below. All options are nullable and any options not set will default to their platform-defined default value.
+
+| Option | Type | iOS | Android |
+|---|---|---|---|
+| `filter` | `Filter?` [(See filter options)](#filter-options)| ✅ | ✅ |
+| `titleTextColor` | `Color?` | ✅ | ✅ |
+| `promptTextColor` | `Color?` | ✅ | ✅ |
+| `closeButtonTintColor` | `Color?` | ✅ | ✅ |
+| `closeButtonImage` | `Image?` | ✅ | ✅ |
+| `title` | `String?` | ✅ | ✅ |
+| `fontPath` (*)| `String?` | ✅  | ✅ |
+| `logoImage` | `Image?` | ✅ | ✅ |
+| `promptBackgroundColor` | `Color?` | ✅ | ✅ |
+| `promptRoundedCorners` | `bool?` | ✅ | ✅ |
+| `surroundColor` | `Color?` | ✅ | ✅ |
+| `certificates` | `List<String>?` | ✅ | ✅ |
+| `timeout` | `Duration?` | ✅ | ✅ |
+| `enableScreenshots` | `bool?` |  | ✅ |
+| `orientation` | `Orientation?` |  | ✅ |
+| `camera` | `Camera?` |  | ✅ |
+| `headerBackgroundColor` | `Color?` | ✅ | ✅ |
+| `disableExteriorEffects` | `bool?` | ✅ | ✅ |
+|**`genuinePresenceAssurance`** | `GenuinePresenceAssuranceOptions?` |  |  |
+| ↳ `readyOvalStrokeColor` | `Color?` | ✅ | ✅ |
+| ↳ `notReadyOvalStrokeColor` | `Color?` | ✅ | ✅ |
+|**`livenessAssurance`** | `LivenessAssuranceOptions?` |  |  |
+| ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
+| ↳ `completedOvalStrokeColor` | `Color?` | ✅ | ✅ |
+
+(*) Fonts should be added to your Flutter app (TTF or OTF formats are supported). Note that the font filename must match the font name.
+
+Example:
+```dart
+const options = Options(fontPath: 'fonts/Lobster-Regula.ttf');
+```
+
+### Filter Options
+
+The SDK supports two different camera filters:
+
+#### `LineDrawingFilter`
+
+`LineDrawingFilter` is iProov's traditional "canny" filter, which is available in 3 styles: `.shaded` (default), `.classic` and `.vibrant`.
+
+The `foregroundColor` and `backgroundColor` can also be customized.
+
+Example:
+
+```dart
+const options = Options(
+      filter: LineDrawingFilter(
+          style: LineDrawingFilterStyle.vibrant,
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.white
+      ),
+    );
+```
+
+#### `NaturalFilter`
+
+`NaturalFilter` provides a more direct visualization of the user's face and is available in 2 styles: `.clear` (default) and `.blur`.
+
+Example:
+
+```dart
+const options = Options(
+      filter: NaturalFilter(
+          style: NaturalFilterStyle.clear
+      ),
+    );
+```
+
+> **Note**: `NaturalFilter` is available for Liveness Assurance claims only. Attempts to use `NaturalFilter` for Genuine Presence Assurance claims will result in an error.
+
+## Handling errors
+
+All errors from the native SDKs are re-mapped to Flutter exceptions:
+
+| Exception                         | iOS | Android | Description                                                                                                                      |
+| --------------------------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `CaptureAlreadyActiveException`   | ✅   | ✅       | An existing iProov capture is already in progress. Wait until the current capture completes before starting a new one.           |
+| `NetworkException`                    | ✅   | ✅       | An error occurred with the video streaming process. Consult the `message` value for more information.                            |
+| `CameraPermissionException`           | ✅   | ✅       | The user disallowed access to the camera when prompted. You should direct the user to re-enable camera access.                   |
+| `ServerException`                 | ✅   | ✅       | A server-side error/token invalidation occurred. The associated `message` will contain further information about the error.      |
+| `UnexpectedErrorException`        | ✅   | ✅       | An unexpected and unrecoverable error has occurred. These errors should be reported to iProov for further investigation.         |
+| `UnsupportedDeviceException`         |✅   | ✅         | Device is not supported.|
+| `ListenerNotRegisteredException`  |     | ✅       | The SDK was launched before a listener was registered.                                                                           |
+| `MultiWindowUnsupportedException` |     | ✅       | The user attempted to iProov in split-screen/multi-screen mode, which is not supported.                                          |
+| `CameraException`                 |     | ✅       | An error occurred acquiring or using the camera. This could happen when a non-phone is used with/without an external/USB camera. |
+| `FaceDetectorException`           |     | ✅       | An error occurred with the face detector.                                                                                        |
+| `InvalidOptionsException`         |     | ✅       | An error occurred when trying to apply your options.|
+| `UserTimeoutException`         |✅   |          | The user has taken too long to complete the claim.|
+
+# \<\/Temporary\>
 
 ## API Client
 

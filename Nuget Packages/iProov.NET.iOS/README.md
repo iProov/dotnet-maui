@@ -1,15 +1,24 @@
-## Xamarin.iOS
+# iProov.NET.iOS Nuget
 
-1. Using the NuGet Package Manager, add the [iProov.iOS](https://www.nuget.org/packages/iProov.iOS/) package to your Xamarin project. For further instructions on how to do this, [see here](https://docs.microsoft.com/en-us/visualstudio/mac/nuget-walkthrough?toc=%2Fnuget%2Ftoc.json&view=vsmac-2019#find-and-install-a-package).
+## Introduction
+
+The iProov.NET.iOS NuGet enables you to integrate iProov's SDK into your .NET iOS projects. 
+
+This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) SDK behind a .NET interface for use from within your .NET app.
+
+
+## How to use it
+
+1. Using the NuGet Package Manager, add the [iProov.NET.iOS](https://www.nuget.org/packages/iProov.NET.iOS/) package to your Xamarin project. For further instructions on how to do this, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
 
 2. Add a "Privacy - Camera Usage Description" entry to your Info.plist file with the reason why your app requires camera access (e.g. "To iProov you in order to verify your identity.")
 
-3. Import the package into your project with `using iProov.iOS;`.
+3. Import the package into your project with `using iProov.NET.iOS;`
 
 4. Once you have obtained a token (either via the .NET API Client or other means), you can launch the iProov iOS SDK as follows:
 
 	```csharp
-	IProov.LaunchWithStreamingURL("wss://eu.rp.secure.iproov.me/ws", token, new IPOptions(), // Substitute streaming URL as appropriate
+	IProov.LaunchWithStreamingURL(new NSUrl("wss://eu.rp.secure.iproov.me/ws"), token, new IPOptions(), // Substitute streaming URL as appropriate
 		connecting: () =>
 		{
 			// The SDK is connecting to the server. You should provide an indeterminate progress indicator
@@ -56,5 +65,6 @@
 		}
 	);
 	```
+> Note that the launch method requires the url to be passed as a **NSURL** 
 	
 👉 You should now familiarise yourself with the [iProov iOS SDK documentation](https://github.com/iProov/ios) which provides comprehensive details about the available customization options and other important details regarding the iOS SDK usage.

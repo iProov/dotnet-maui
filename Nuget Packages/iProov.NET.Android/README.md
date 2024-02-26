@@ -9,7 +9,7 @@ This NuGet wraps iProov's existing native [Android](https://github.com/iProov/an
 
 ## How to use it
 
-1. Using the NuGet Package Manager, add the [iProov.NET.Android](https://www.nuget.org/packages/iProov.Android/) package to your project. For further instructions on how to install and manage packages, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
+1. Using the NuGet Package Manager, add the [iProov.NET.Android](https://www.nuget.org/packages/iProov.NET.Android/) package to your project. For further instructions on how to install and manage packages, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
 
 2. Import the package into your project with `using iProov.NET.Android;`
 
