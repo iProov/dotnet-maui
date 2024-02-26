@@ -13,6 +13,7 @@ test-results/
 
 # Credentials file
 ExampleAppMAUI/Credentials.cs
+ExampleAppMAUI/Credentials.example.cs
 
 # Mac bundle stuff
 *.dmg
