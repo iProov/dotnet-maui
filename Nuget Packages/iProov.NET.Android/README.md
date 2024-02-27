@@ -6,6 +6,10 @@ The iProov.NET.Android NuGet enables you to integrate iProov's SDK into your .NE
 
 This NuGet wraps iProov's existing native [Android](https://github.com/iProov/android) SDK behind a .NET interface for use from within your .NET app.
 
+### Requirements
+
+- NET 8 (net8-android)
+- Android API Level 21 (Android 5 Lollipop) and above
 
 ## How to use it
 

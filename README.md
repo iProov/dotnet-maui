@@ -5,10 +5,11 @@
 ## Table of contents
 
 - [Introduction](#introduction)
+- [Requirements](#requirements)
 - [Repository contents](#repository-contents)
-- [Upgrading from earlier versions](#upgrading-from-earlier-versions)
 - [Registration](#registration)
-- [Xamarin.iOS](#xamarin--ios)
+- [Installation](#installation)
+- [Get Started](#get-started)
 - [Xamarin.Android](#xamarin--android)
 - [API Client](#api-client)
 - [Sample code](#sample-code)
@@ -21,7 +22,7 @@ We also provide a .NET API Client written in C# to call our [REST API v2](https:
 
 This documentation is focused on the **iProov.NET.MAUI** package. There's nuget-specific documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.iOS/) packages.
 
-### Requirements
+## Requirements
 
 - NET 8 (net8-android;net8-ios)
 - iOS 12 and above
@@ -40,6 +41,128 @@ The iProov Xamarin SDK is provided via this repository, which contains the follo
 ## Registration
 
 You can obtain API credentials by registering on the [iProov Partner Portal](https://www.iproov.net).
+
+## Installation
+
+The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.org/packages/iProov.NET.MAUI/). Hence, you can add the package to your project either:
+
+1. Using the NuGet Package Manager, and adding the iProov.NET.MAUI package to your project from there. For further instructions on how to install and manage packages, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
+
+> If you want to use the nuget package from a local source, make sure to add the folder where you store the nuget packages as a Nuget source in Visual Studio > Preferences
+
+2. Edit your `.csproj` file and add the `<PackageReference>` to the nuget package
+
+ ```
+ <ItemGroup>
+   <PackageReference Include="iProov.NET.MAUI" Version="1.0.0" />
+ </ItemGroup>
+ ```
+
+## Get Started
+
+### Get a Token
+
+Obtain these tokens:
+
+- A **verify** token for logging in an existing user
+- An **enrol** token for registering a new user
+
+See the [REST API documentation](https://secure.iproov.me/docs.html) for details about how to generate tokens.
+
+> **TIP:** In a production app you typically obtain tokens via a server-to-server back-end call. For demos and testing, iProov provides .NET sample code for obtaining tokens via [iProov API v2](https://eu.rp.secure.iproov.me/docs.html) with our open-source [API Client](https://github.com/iProov/dotnet-maui/tree/master/APIClient).
+
+
+### Launch the SDK
+
+#### 1. Create and instance of IProovWrapper
+
+ ```csharp
+	private IProovWrapper wrapper = new IProovWrapper();
+ ```
+
+#### 2. Listening to IProovStates
+
+To monitor the progress of an iProov claim and receive the result you need an instance of `IProovWrapper.IStateListener` interface. So, you can either create a private class which implements this interface to handle the callbacks from the SDK, or you can implement the interface in your `Activity` class.
+
+ ```csharp
+public class IProovListener: IProovWrapper.IStateListener {
+
+	public void OnConnecting()
+	{
+		// Called when the SDK is connecting to the server. You could provide an indeterminate
+		// progress indication to let the user know that the connection is being established.
+	}
+
+	public void OnConnected()
+	{
+		// The SDK has connected and the iProov user interface is now displayed. You
+		// could hide any progress indicator at this point.
+	}
+
+	public void OnProcessing(double progress, string? message)
+	{
+		// The SDK updates your app with the streaming progress to the server and the user authentication.
+		// Called multiple time as the progress updates. You could update a determinate progress indicator.
+	}
+
+	public void OnCanceled(Canceler canceler)
+	{
+		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
+		// the app to the background. (canceler == Canceler.User)
+		// Or, the app canceled (event.canceler == Canceler.App) by canceling the subscription to the 
+		// Stream returned from IProov.launch().
+		// You should use this to determine the next step in your flow.
+	}
+
+	public void OnError(IProovException exception)
+	{
+		// The user was not successfully verified/enrolled due to an error (e.g. lost internet connection).
+		// You will be provided with an Exception (see below).
+		// It will be called once, or never.
+		// An IProovException contains a title that describes the exception, and may also contain a message.
+		string title = exception.title;
+		string? message = exception.message;
+	}
+
+	public void OnFailure(IProovFailureResult failure)
+	{
+		// The user was not successfully verified/enrolled as their identity could not be verified.
+		// Or there was another issue with their verification/enrollment.
+		// You might provide feedback to the user as to how to retry. 
+		// A FailureReason value is provided to identify the reason as to why the claim failed. Some reasons also provide an optional description (as a string).
+		// When enabled for your service provider, failure.frame contains the bytes of an image containing a single frame of the user
+
+		FailureReason reason = failure.reason;
+		string? description = failure.description;
+		byte[]? frame = failure.frame;
+	}
+
+	public void OnSuccess(byte[]? frame)
+	{
+		// The user was successfully verified/enrolled.
+		// You must always independently validate the token server-side (using the /validate API call) before performing any authenticated user actions.
+		// When enabled for your service provider, frame contains the bytes of an image containing a single frame of the user
+	}
+}
+ ```
+
+#### 3. Launch a Claim
+
+To launch a Claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener`. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+
+ ```csharp
+	IProovWrapper wrapper = new IProovWrapper();
+	IProovListener listener = new IProovListener();
+
+	private void launchIProov(string token, string userId)
+	{
+		var options = new IProovOptions();
+		// Here you can customize any IProovOption
+
+		wrapper.LaunchIProov(token, userId, "wss://eu.rp.secure.iproov.me/ws", listener, options);
+    }
+ ```
+
 
 
 # \<Temporary\> From flutter doc
