@@ -16,37 +16,77 @@
                 x:Name="GenerateUUIDBtn"
                 Text="Generate UUID"
                 Clicked="OnGenerateUUID"
-                BackgroundColor="DarkBlue"
+                BackgroundColor="RoyalBlue"
                 />
 
-            <HorizontalStackLayout
-                Spacing="15"
-                HorizontalOptions="Center">
-                <Button
-                    x:Name="GPAButton"
-                    Text="GPA" 
-                    Clicked="OnGPAButtonClicked"
-                    HorizontalOptions="Fill"
-                    BackgroundColor="DarkBlue"
-                    TextColor="White"
-                 />
+            <VerticalStackLayout
+                Spacing="8">
 
-                <Button
-                    x:Name="LAButton"
-                    Text="LA" 
-                    Clicked="OnLAButtonClicked"
-                    HorizontalOptions="Fill"
-                    BackgroundColor="DarkGray"
-                    TextColor="White"
-                 />
-            </HorizontalStackLayout>
+                <Label x:Name="selectClaimTypeLabel"
+                   Text="Select claim type"
+                   HorizontalOptions="Center"/>
+
+                <HorizontalStackLayout
+                    Spacing="8"
+                    HorizontalOptions="Center">
+                    <Button
+                        x:Name="EnrolButton"
+                        Text="Enrol" 
+                        Clicked="OnEnrolButtonClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="RoyalBlue"
+                        TextColor="White"
+                        WidthRequest="{Binding Path=Width, Source={x:Reference VerifyButton}}"
+                     />
+
+                    <Button
+                        x:Name="VerifyButton"
+                        Text="Verify" 
+                        Clicked="OnVerifyButtonClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="DarkGray"
+                        TextColor="White"
+                     />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+            
+            <VerticalStackLayout
+                Spacing="8">
+
+                <Label x:Name="selectAssuranceTypeLabel"
+                   Text="Select assurance type"
+                   HorizontalOptions="Center"/>
+
+                <HorizontalStackLayout
+                    Spacing="8"
+                    HorizontalOptions="Center">
+                    <Button
+                        x:Name="GPAButton"
+                        Text="GPA" 
+                        Clicked="OnGPAButtonClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="RoyalBlue"
+                        TextColor="White"
+                     />
+
+                    <Button
+                        x:Name="LAButton"
+                        Text="LA" 
+                        Clicked="OnLAButtonClicked"
+                        HorizontalOptions="Fill"
+                        BackgroundColor="DarkGray"
+                        TextColor="White"
+                        WidthRequest="{Binding Path=Width, Source={x:Reference GPAButton}}"
+                     />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
 
             <Button
                 x:Name="LaunchButton"
                 Text="Enrol with GPA" 
                 Clicked="OnLaunchIProov"
                 HorizontalOptions="Fill" 
-                BackgroundColor="DarkBlue"
+                BackgroundColor="RoyalBlue"
             />
 
             <Image x:Name="ClaimFrame"/>

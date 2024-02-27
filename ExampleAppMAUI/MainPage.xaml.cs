@@ -8,6 +8,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 {
     IProovWrapper wrapper = new IProovWrapper();
     AssuranceType assuranceType = new AssuranceType();
+    ClaimType claimType = new ClaimType();
 
     public MainPage()
 	{
@@ -24,6 +25,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         base.OnAppearing();
         SDKversion.Text = wrapper.GetSdkVersion();
         assuranceType = AssuranceType.GenuinePresence;
+        claimType = ClaimType.Enrol;
     }
 
     private async void OnLaunchIProov(object sender, EventArgs e)
@@ -46,7 +48,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
 			try
 			{
-                var token = await apiClient.GetToken(assuranceType, ClaimType.Enrol, userId);
+                var token = await apiClient.GetToken(assuranceType, claimType, userId);
                 launchIProov(token, userId);
             }
             catch (Exception exception)
@@ -109,6 +111,18 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         UpdateUI();
     }
 
+    void OnEnrolButtonClicked(object sender, EventArgs e)
+    {
+        claimType = ClaimType.Enrol;
+        UpdateUI();
+    }
+
+    void OnVerifyButtonClicked(object sender, EventArgs e)
+    {
+        claimType = ClaimType.Verify;
+        UpdateUI();
+    }
+
     public void OnConnected()
     {
         Console.WriteLine("iPROOV --- Connected");
@@ -155,9 +169,12 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     private void UpdateUI()
     {
         bool isGPA = assuranceType == AssuranceType.GenuinePresence;
-        GPAButton.BackgroundColor = isGPA ? Colors.DarkBlue : Colors.DarkGray;
-        LAButton.BackgroundColor = !isGPA ? Colors.DarkBlue : Colors.DarkGray;
-        LaunchButton.Text = isGPA ? "Enroll with GPA" : "Enroll with LA";
+        bool isEnrol = claimType == ClaimType.Enrol;
+        GPAButton.BackgroundColor = isGPA ? Colors.RoyalBlue : Colors.DarkGray;
+        LAButton.BackgroundColor = !isGPA ? Colors.RoyalBlue : Colors.DarkGray;
+        EnrolButton.BackgroundColor = isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
+        VerifyButton.BackgroundColor = !isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
+        LaunchButton.Text = (isEnrol ? "Enrol" : "Verify") + " with " + (isGPA ? "GPA" : "LA");
     }
 
     private void LoadFrameResult(byte[] frame)
