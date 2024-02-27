@@ -15,14 +15,39 @@
             <Button
                 x:Name="GenerateUUIDBtn"
                 Text="Generate UUID"
-                Clicked="onGenerateUUID"
+                Clicked="OnGenerateUUID"
+                BackgroundColor="DarkBlue"
                 />
 
+            <HorizontalStackLayout
+                Spacing="15"
+                HorizontalOptions="Center">
+                <Button
+                    x:Name="GPAButton"
+                    Text="GPA" 
+                    Clicked="OnGPAButtonClicked"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="DarkBlue"
+                    TextColor="White"
+                 />
+
+                <Button
+                    x:Name="LAButton"
+                    Text="LA" 
+                    Clicked="OnLAButtonClicked"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="DarkGray"
+                    TextColor="White"
+                 />
+            </HorizontalStackLayout>
+
             <Button
-                x:Name="LaunchEnrolBtn"
-                Text="Enrol with LA" 
+                x:Name="LaunchButton"
+                Text="Enrol with GPA" 
                 Clicked="OnLaunchIProov"
-                HorizontalOptions="Fill" />
+                HorizontalOptions="Fill" 
+                BackgroundColor="DarkBlue"
+            />
 
             <Image x:Name="ClaimFrame"/>
 

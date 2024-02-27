@@ -7,6 +7,7 @@ namespace ExampleAppMAUI;
 public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 {
     IProovWrapper wrapper = new IProovWrapper();
+    AssuranceType assuranceType = new AssuranceType();
 
     public MainPage()
 	{
@@ -22,6 +23,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     {
         base.OnAppearing();
         SDKversion.Text = wrapper.GetSdkVersion();
+        assuranceType = AssuranceType.GenuinePresence;
     }
 
     private async void OnLaunchIProov(object sender, EventArgs e)
@@ -44,7 +46,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
 			try
 			{
-                var token = await apiClient.GetToken(AssuranceType.Liveness, ClaimType.Enrol, userId);
+                var token = await apiClient.GetToken(assuranceType, ClaimType.Enrol, userId);
                 launchIProov(token, userId);
             }
             catch (Exception exception)
@@ -90,9 +92,21 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         options.surroundColor = Colors.SteelBlue;
     }
 
-	void onGenerateUUID(object sender, EventArgs e)
+	void OnGenerateUUID(object sender, EventArgs e)
 	{
 		UserIdEntry.Text = Guid.NewGuid().ToString();
+    }
+
+    void OnGPAButtonClicked(object sender, EventArgs e)
+    {
+        assuranceType = AssuranceType.GenuinePresence;
+        UpdateUI();
+    }
+
+    void OnLAButtonClicked(object sender, EventArgs e)
+    {
+        assuranceType = AssuranceType.Liveness;
+        UpdateUI();
     }
 
     public void OnConnected()
@@ -137,6 +151,14 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     }
 
     // Utils
+
+    private void UpdateUI()
+    {
+        bool isGPA = assuranceType == AssuranceType.GenuinePresence;
+        GPAButton.BackgroundColor = isGPA ? Colors.DarkBlue : Colors.DarkGray;
+        LAButton.BackgroundColor = !isGPA ? Colors.DarkBlue : Colors.DarkGray;
+        LaunchButton.Text = isGPA ? "Enroll with GPA" : "Enroll with LA";
+    }
 
     private void LoadFrameResult(byte[] frame)
     {
