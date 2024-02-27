@@ -53,8 +53,8 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
             }
             catch (Exception exception)
 			{
-				await DisplayAlert("Error", $"Exception: {exception}", "OK");
-			}
+                await DisplayAlert("Failed to get token", $"{exception.Message}", "OK");
+            }
 
         } else
 		{

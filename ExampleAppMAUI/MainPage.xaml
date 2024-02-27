@@ -17,6 +17,7 @@
                 Text="Generate UUID"
                 Clicked="OnGenerateUUID"
                 BackgroundColor="RoyalBlue"
+                TextColor="White"
                 />
 
             <VerticalStackLayout
@@ -87,6 +88,7 @@
                 Clicked="OnLaunchIProov"
                 HorizontalOptions="Fill" 
                 BackgroundColor="RoyalBlue"
+                TextColor="White"
             />
 
             <Image x:Name="ClaimFrame"/>
