@@ -10,7 +10,8 @@
 - [Registration](#registration)
 - [Installation](#installation)
 - [Get Started](#get-started)
-- [Xamarin.Android](#xamarin--android)
+- [Options](#options)
+- [Handling Errors](#handling-errors)
 - [API Client](#api-client)
 - [Sample code](#sample-code)
 
@@ -18,23 +19,22 @@
 
 The iProov .NET SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Biometric SDKs in MAUI developments. 
 
-We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your Xamarin app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
+We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your .NET app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
 
-This documentation is focused on the **iProov.NET.MAUI** package. There's nuget-specific documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.iOS/) packages.
+This documentation is focused on the **iProov.NET.MAUI** package. There's also documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.iOS/) packages.
 
 ## Requirements
 
-- NET 8 (net8-android;net8-ios)
+- NET 8 (net8-android & net8-ios)
 - iOS 12 and above
 - Android API Level 21 (Android 5 Lollipop) and above
 
-
 ## Repository contents
 
-The iProov Xamarin SDK is provided via this repository, which contains the following:
+The iProov .NET MAUI SDK is provided via this repository, which contains the following:
 
 - **README.md** - This document
-- **NuGet Packages** - Directory containing the NuGet packages for iProov.NET.Android, iProov.NET.iOS & iProov.NET.MAUI
+- **NuGet Packages** - Folder containing the NuGet packages for iProov.NET.Android, iProov.NET.iOS & iProov.NET.MAUI
 - **APIClient** - C# project with the source code for the .NET API Client
 - **ExampleAppMAUI** - Sample code demonstrating use of the iProov.NET.MAUI together with the .NET API Client
 
@@ -50,7 +50,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
 > If you want to use the nuget package from a local source, make sure to add the folder where you store the nuget packages as a Nuget source in Visual Studio > Preferences
 
-2. Edit your `.csproj` file and add the `<PackageReference>` to the nuget package
+2. Or edit your `.csproj` file and add the `<PackageReference>` to the `iProov.NET.MAUI` package
 
  ```
  <ItemGroup>
@@ -62,7 +62,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
 ### Get a Token
 
-Obtain these tokens:
+There are two types of tokens:
 
 - A **verify** token for logging in an existing user
 - An **enrol** token for registering a new user
@@ -82,7 +82,7 @@ See the [REST API documentation](https://secure.iproov.me/docs.html) for details
 
 #### 2. Listening to IProovStates
 
-To monitor the progress of an iProov claim and receive the result you need an instance of `IProovWrapper.IStateListener` interface. So, you can either create a private class which implements this interface to handle the callbacks from the SDK, or you can implement the interface in your `Activity` class.
+To monitor the progress of an iProov claim and receive the result you need an instance of `IProovWrapper.IStateListener` interface. So, you will have to implement this interface in one of your classes, or create a new one, as shown in the following example.
 
  ```csharp
 public class IProovListener: IProovWrapper.IStateListener {
@@ -147,7 +147,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 
 #### 3. Launch a Claim
 
-To launch a Claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener`. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+To launch a Claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
 
  ```csharp
 	IProovWrapper wrapper = new IProovWrapper();
@@ -161,6 +161,11 @@ To launch a Claim you need to provide a `token`, a `userId`, the websocket url o
 		wrapper.LaunchIProov(token, userId, "wss://eu.rp.secure.iproov.me/ws", listener, options);
     }
  ```
+
+#### _\** Running on iOS_
+
+For iProov to work on iOS devices, you need to add a `Privacy - Camera Usage Description` entry to your Info.plist file (`<Your_App_Folder>/Platforms/iOS/Info.plist`) with the reason why your app requires camera access (e.g. "To iProov you in order to verify your identity.")
+
 
 ## Options
 
@@ -275,8 +280,6 @@ The .NET API Client supports the following functionality:
 
 To add the .NET API Client to your project, add it as a sub-project to your solution, and then [add a reference](https://docs.microsoft.com/en-us/visualstudio/mac/managing-references-in-a-project?view=vsmac-2019) to the **APIClient** project from your app project.
 
-You will also need to [add](https://docs.microsoft.com/en-us/visualstudio/mac/nuget-walkthrough?view=vsmac-2019) the **Newtonsoft.Json** NuGet package to your project as well.
-
 You can now import the API Client with `using iProov.APIClient;`.
 
 ### Usage examples
@@ -290,43 +293,26 @@ The most basic thing you can do with the API Client is get a token to either enr
 This is achieved as follows:
 
 ```csharp
+ApiClient apiClient = new ApiClient(
+            "https://beta.rp.secure.iproov.me/api/v2",
+            "{{ apiKey }}",
+            "{{ secret }}",
+            "com.iproov.ExampleAppMAUI");
+
 var token = await apiClient.GetToken(AssuranceType.GenuinePresence, ClaimType.Enrol, "{{ user id }}");
 ```
 
 You can then launch the iProov SDK with this token.
 
-#### Performing a photo enrol (on iOS)
-
-To photo enrol a user, you would first generate an enrolment token, then enrol the photo against the user, then generate a verification token.
-
-Fortunately the .NET API Client provides a helper method which wraps all three calls into one convenience method.
-
-The first thing you will need to do is convert your iOS native `UIImage` into a .NET `byte[]` which can be handled by the cross-platform API Client:
-
-```csharp
-var uiImage = UIImage.FromBundle("image.png");  // (For example)
-var jpegData = uiImage.AsJPEG();
-byte[] jpegBytes = new byte[jpegData.Length];
-Marshal.Copy(jpegData.Bytes, jpegBytes, 0, Convert.ToInt32(jpegData.Length));
-```
-
-You can now pass the `jpegBytes` to the `EnrolPhotoAndGetVerifyToken()` method:
-
-```csharp
-string token = await apiClient.EnrolPhotoAndGetVerifyToken(guid, jpegBytes, PhotoSource.oid);
-```
-
-You can now launch the iProov SDK with this token to complete the photo enrolment.
-
 ## Sample code
 
-For a simple iProov experience that is ready to run out-of-the-box, check out the [Example  project](https://github.com/iProov/xamarin/tree/master/Example) for Xamarin.iOS and Xamarin.Android which also makes use of the .NET API Client.
+For a simple iProov experience that is ready to run out-of-the-box, check out the [ExampleAppMAUI project](https://github.com/iProov/xamarin/tree/master/ExampleAppMAUI) for a .NET MAUI app that uses `iProov.NET.MAUI` and also makes use of the .NET API Client.
 
 ### Usage
 
-1. Copy the file _Shared/Credentials.example.cs_ to _Shared/Credentials.cs_ and provide your API key & secret.
-2. Open the Example solution in Visual Studio.
+1. Set your API key & secret in the Credentials.cs file.
+2. Open the ExampleAppMAUI solution in Visual Studio.
 3. Right click the root project and "Restore NuGet Packages" to ensure all NuGet packages are ready for usage.
-4. Run the iOSExample or AndroidExample project on a supported iOS or Android device respectively.
+4. Run the ExampleAppMAUI project on a supported iOS or Android device.
 
 > NOTE: iProov is not supported on the iOS or Android simulator, you must use a physical device in order to iProov.

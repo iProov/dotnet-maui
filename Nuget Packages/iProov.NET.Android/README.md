@@ -119,4 +119,4 @@ This NuGet wraps iProov's existing native [Android](https://github.com/iProov/an
 	iProovLauncher.Launch(this, "wss://eu.rp.secure.iproov.me/ws", token, new IProov.Options()); // Substitute the streaming URL as appropriate
 	```
 	
-👉 You should now familiarise yourself with the [iProov Android SDK documentation](https://github.com/iProov/android) which provides comprehensive details about the available customization options and other important details regarding the iOS SDK usage.
+👉 You should now familiarise yourself with the [iProov Android SDK documentation](https://github.com/iProov/android) which provides comprehensive details about the available customization options and other important details regarding the Android SDK usage.
