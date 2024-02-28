@@ -81,9 +81,11 @@
 	<ItemGroup>
 	  <None Remove="Resources\Images\custom_back.png" />
 	  <None Remove="Resources\Images\logo.png" />
+	  <None Remove="Resources\Images\reload.png" />
 	</ItemGroup>
 	<ItemGroup>
 	  <MauiImage Include="Resources\Images\logo.png" />
 	  <MauiImage Include="Resources\Images\custom_back.png" />
+	  <MauiImage Include="Resources\Images\reload.png" />
 	</ItemGroup>
 </Project>
