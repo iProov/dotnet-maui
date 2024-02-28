@@ -109,8 +109,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 	{
 		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
 		// the app to the background. (canceler == Canceler.User)
-		// Or, the app canceled (event.canceler == Canceler.App) by canceling the subscription to the 
-		// Stream returned from IProov.launch().
+		// Or, the app canceled (event.canceler == Canceler.App) by canceling the claim.
 		// You should use this to determine the next step in your flow.
 	}
 
@@ -163,18 +162,15 @@ To launch a Claim you need to provide a `token`, a `userId`, the websocket url o
     }
  ```
 
-
-
-# \<Temporary\> From flutter doc
 ## Options
 
-The `Options` class allows iProov to be customized in various ways. These can be specified by passing the optional `options:` named parameter in `IProov.launch()`.
+The `Options` class allows iProov to be customized in various ways. These can be specified by passing an instance of `IProovOptions` in the `LaunchIProov()` method.
 
 Most of these options are common to both Android and iOS, however, some are Android-only.
 
 For full documentation, please read the respective [iOS](https://github.com/iProov/ios#options) and [Android](https://github.com/iProov/android#customize-the-user-experience) native SDK documentation.
 
-A summary of the support for the various SDK options in Flutter is provided below. All options are nullable and any options not set will default to their platform-defined default value.
+A summary of the support for the various SDK options in **iProov.NET.MAUI** is provided below. All options are nullable and any options not set will default to their platform-defined default value.
 
 | Option | Type | iOS | Android |
 |---|---|---|---|
@@ -182,33 +178,28 @@ A summary of the support for the various SDK options in Flutter is provided belo
 | `titleTextColor` | `Color?` | ✅ | ✅ |
 | `promptTextColor` | `Color?` | ✅ | ✅ |
 | `closeButtonTintColor` | `Color?` | ✅ | ✅ |
-| `closeButtonImage` | `Image?` | ✅ | ✅ |
-| `title` | `String?` | ✅ | ✅ |
-| `fontPath` (*)| `String?` | ✅  | ✅ |
-| `logoImage` | `Image?` | ✅ | ✅ |
+| `closeButtonImage` | `byte[]?` | ✅ | ✅ |
+| `title` | `string?` | ✅ | ✅ |
+| `fontPath` | `string?` | ✅  | ✅ |
+| `logoImage` | `byte[]?` | ✅ | ✅ |
 | `promptBackgroundColor` | `Color?` | ✅ | ✅ |
 | `promptRoundedCorners` | `bool?` | ✅ | ✅ |
 | `surroundColor` | `Color?` | ✅ | ✅ |
-| `certificates` | `List<String>?` | ✅ | ✅ |
-| `timeout` | `Duration?` | ✅ | ✅ |
+| `certificates` | `IList<string>?` | ✅ | ✅ |
+| `timeout` | `int?` | ✅ | ✅ |
 | `enableScreenshots` | `bool?` |  | ✅ |
 | `orientation` | `Orientation?` |  | ✅ |
 | `camera` | `Camera?` |  | ✅ |
 | `headerBackgroundColor` | `Color?` | ✅ | ✅ |
 | `disableExteriorEffects` | `bool?` | ✅ | ✅ |
-|**`genuinePresenceAssurance`** | `GenuinePresenceAssuranceOptions?` |  |  |
+| `stringsTable` | `string?` | ✅ | |
+| `stringsBundle` | `string?` | ✅ | |
+|**`genuinePresenceAssurance`** | `GenuinePresenceAssurance?` |  |  |
 | ↳ `readyOvalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `notReadyOvalStrokeColor` | `Color?` | ✅ | ✅ |
-|**`livenessAssurance`** | `LivenessAssuranceOptions?` |  |  |
+|**`livenessAssurance`** | `LivenessAssurance?` |  |  |
 | ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `completedOvalStrokeColor` | `Color?` | ✅ | ✅ |
-
-(*) Fonts should be added to your Flutter app (TTF or OTF formats are supported). Note that the font filename must match the font name.
-
-Example:
-```dart
-const options = Options(fontPath: 'fonts/Lobster-Regula.ttf');
-```
 
 ### Filter Options
 
@@ -216,41 +207,38 @@ The SDK supports two different camera filters:
 
 #### `LineDrawingFilter`
 
-`LineDrawingFilter` is iProov's traditional "canny" filter, which is available in 3 styles: `.shaded` (default), `.classic` and `.vibrant`.
+`LineDrawingFilter` is iProov's traditional "canny" filter, which is available in 3 styles: `.Shaded` (default), `.Classic` and `.Vibrant`.
 
 The `foregroundColor` and `backgroundColor` can also be customized.
 
 Example:
 
-```dart
-const options = Options(
-      filter: LineDrawingFilter(
-          style: LineDrawingFilterStyle.vibrant,
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.white
-      ),
-    );
+```csharp
+var options = IProovOptions();
+
+options.filter = new IProovOptions.LineDrawingFilter(
+                style: LineDrawingFilterStyle.Shaded,
+                foregroundColor: Colors.Black,
+                backgroundColor: Colors.White);
 ```
 
 #### `NaturalFilter`
 
-`NaturalFilter` provides a more direct visualization of the user's face and is available in 2 styles: `.clear` (default) and `.blur`.
+`NaturalFilter` provides a more direct visualization of the user's face and is available in 2 styles: `.Clear` (default) and `.Blur`.
 
 Example:
 
-```dart
-const options = Options(
-      filter: NaturalFilter(
-          style: NaturalFilterStyle.clear
-      ),
-    );
+```csharp
+var options = IProovOptions();
+
+options.filter = new IProovOptions.NaturalFilter(style: NaturalFilterStyle.Clear);
 ```
 
 > **Note**: `NaturalFilter` is available for Liveness Assurance claims only. Attempts to use `NaturalFilter` for Genuine Presence Assurance claims will result in an error.
 
 ## Handling errors
 
-All errors from the native SDKs are re-mapped to Flutter exceptions:
+All errors from the native SDKs are re-mapped to `IProovException` exceptions:
 
 | Exception                         | iOS | Android | Description                                                                                                                      |
 | --------------------------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -267,7 +255,6 @@ All errors from the native SDKs are re-mapped to Flutter exceptions:
 | `InvalidOptionsException`         |     | ✅       | An error occurred when trying to apply your options.|
 | `UserTimeoutException`         |✅   |          | The user has taken too long to complete the claim.|
 
-# \<\/Temporary\>
 
 ## API Client
 
