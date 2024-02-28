@@ -6,6 +6,11 @@ The iProov.NET.iOS NuGet enables you to integrate iProov's SDK into your .NET iO
 
 This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) SDK behind a .NET interface for use from within your .NET app.
 
+### Requirements
+
+- NET 8 (net8-ios)
+- iOS 12 and above
+
 
 ## How to use it
 
