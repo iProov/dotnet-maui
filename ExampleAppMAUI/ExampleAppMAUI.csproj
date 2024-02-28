@@ -79,9 +79,11 @@
 	  <ProjectReference Include="..\APIClient\APIClient.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Resources\Images\custom-back.png" />
+	  <None Remove="Resources\Images\custom_back.png" />
+	  <None Remove="Resources\Images\logo.png" />
 	</ItemGroup>
 	<ItemGroup>
-	  <EmbeddedResource Include="Resources\Images\custom-back.png" />
+	  <MauiImage Include="Resources\Images\logo.png" />
+	  <MauiImage Include="Resources\Images\custom_back.png" />
 	</ItemGroup>
 </Project>

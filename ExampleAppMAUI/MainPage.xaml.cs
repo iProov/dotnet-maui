@@ -81,7 +81,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
         options.enableScreenShots = false;
         options.closeButtonTintColor = Colors.Red;
-        options.closeButtonImage = ImageToByteArrayAsync("ExampleAppMAUI.Resources.Images.custom-back.png");
+        options.closeButtonImage = ImageToByteArrayAsync("ExampleAppMAUI.Resources.Images.custom_back.png");
         options.disableExteriorEffects = false;
         options.filter = new IProovOptions.LineDrawingFilter(LineDrawingFilterStyle.Vibrant);
         options.headerBackgroundColor = Colors.Yellow;

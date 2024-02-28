@@ -7,6 +7,12 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
+
+            <Image x:Name="logoImage"
+                   Source="logo.png"
+                   Margin="40"
+                   MaximumHeightRequest="150"/>
+
             <Label x:Name="SDKversion"/>
             <Entry x:Name="UserIdEntry"
                 Placeholder="Enter text"
