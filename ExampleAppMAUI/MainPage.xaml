@@ -140,7 +140,7 @@
             <Image x:Name="ClaimFrame"/>
 
             <Label x:Name="SDKVersionLabel"
-               Margin="0,50,0,0"
+               Margin="0,50,0,30"
                HorizontalOptions="Center"
             />
         </VerticalStackLayout>
