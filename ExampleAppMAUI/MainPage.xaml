@@ -13,7 +13,6 @@
                    Margin="40"
                    MaximumHeightRequest="150"/>
 
-            <Label x:Name="SDKversion"/>
             <Entry x:Name="UserIdEntry"
                 Placeholder="Enter text"
                 />
@@ -99,6 +98,10 @@
 
             <Image x:Name="ClaimFrame"/>
 
+            <Label x:Name="SDKVersionLabel"
+               Margin="0,50,0,0"
+               HorizontalOptions="Center"
+            />
         </VerticalStackLayout>
     </ScrollView>
 

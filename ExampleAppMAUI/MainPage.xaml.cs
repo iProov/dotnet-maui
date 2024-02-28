@@ -23,7 +23,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        SDKversion.Text = wrapper.GetSdkVersion();
+        SDKVersionLabel.Text = "SDK Version:" + wrapper.GetSdkVersion();
         assuranceType = AssuranceType.GenuinePresence;
         claimType = ClaimType.Enrol;
     }
