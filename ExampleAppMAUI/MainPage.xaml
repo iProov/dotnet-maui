@@ -15,7 +15,8 @@
                    MaximumHeightRequest="140"/>
 
             <VerticalStackLayout
-                Spacing="8">
+                Spacing="8"
+                x:Name="UserIdVerticalStackLayout">
 
                 <Label x:Name="UserIdLabel"
                        Text="User ID"
@@ -46,7 +47,8 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout
-                Spacing="8">
+                Spacing="8"
+                x:Name="ClaimTypeVerticalStackLayout">
 
                 <Label x:Name="selectClaimTypeLabel"
                    Text="Select claim type"
@@ -87,7 +89,8 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout
-                Spacing="8">
+                Spacing="8"
+                x:Name="AssuranceTypeVerticalStackLayout">
 
                 <Label x:Name="selectAssuranceTypeLabel"
                    Text="Select assurance type"

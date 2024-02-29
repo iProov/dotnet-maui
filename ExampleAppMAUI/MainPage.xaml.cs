@@ -62,6 +62,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
 	private void launchIProov(string token, string userId)
 	{
+        DisableControlElements();
         ClaimFrame.Source = null;
 
         var options = new IProovOptions();
@@ -200,6 +201,23 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     private void ClaimEnded()
     {
         UpdateProgress(1);
+        EnableControlElements();
+    }
+
+    private void EnableControlElements()
+    {
+        UserIdVerticalStackLayout.IsEnabled = true;
+        ClaimTypeVerticalStackLayout.IsEnabled = true;
+        AssuranceTypeVerticalStackLayout.IsEnabled = true;
+        LaunchButton.IsEnabled = true;
+    }
+
+    private void DisableControlElements()
+    {
+        UserIdVerticalStackLayout.IsEnabled = false;
+        ClaimTypeVerticalStackLayout.IsEnabled = false;
+        AssuranceTypeVerticalStackLayout.IsEnabled = false;
+        LaunchButton.IsEnabled = false;
     }
 
     private void LoadFrameResult(byte[] frame)
