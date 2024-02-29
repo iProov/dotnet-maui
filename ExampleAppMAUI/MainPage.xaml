@@ -127,6 +127,13 @@
                 </Border>
             </VerticalStackLayout>
 
+            <ProgressBar
+                x:Name="ClaimProgress"
+                IsVisible="false"
+                Progress="0"
+                ProgressColor="RoyalBlue"
+            />
+
             <Button
                 x:Name="LaunchButton"
                 Text="Enrol with GPA" 

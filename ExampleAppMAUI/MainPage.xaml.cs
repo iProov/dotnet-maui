@@ -7,8 +7,8 @@ namespace ExampleAppMAUI;
 public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 {
     IProovWrapper wrapper = new IProovWrapper();
-    AssuranceType assuranceType = new AssuranceType();
-    ClaimType claimType = new ClaimType();
+    AssuranceType assuranceType = AssuranceType.GenuinePresence;
+    ClaimType claimType = ClaimType.Enrol;
 
     public MainPage()
 	{
@@ -24,8 +24,6 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     {
         base.OnAppearing();
         SDKVersionLabel.Text = "SDK Version: " + wrapper.GetSdkVersion();
-        assuranceType = AssuranceType.GenuinePresence;
-        claimType = ClaimType.Enrol;
     }
 
     private async void OnLaunchIProov(object sender, EventArgs e)
@@ -136,11 +134,13 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     public void OnCanceled(Canceler canceler)
     {
         DisplayAlert("OnCanceled", $"Canceled by {canceler}", "OK");
+        ClaimEnded();
     }
 
     public void OnError(IProovException exception)
     {
         DisplayAlert("OnError", $"Exception: {exception.GetType}\nTitle: {exception.title} // Message: {exception.message}", "OK");
+        ClaimEnded();
     }
 
     public void OnFailure(IProovFailureResult failure)
@@ -148,11 +148,14 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         DisplayAlert("OnFailure", $"Reason: {failure.reason}\nDescription: {failure.description}", "OK");
         if (failure.frame != null)
             LoadFrameResult(failure.frame);
+
+        ClaimEnded();
     }
 
     public void OnProcessing(double progress, string? message)
     {
         Console.WriteLine($"iPROOV --- OnProcessing(progres: {progress}, message: {message})");
+        UpdateProgress(progress);
     }
 
     public void OnSuccess(byte[]? frame)
@@ -162,6 +165,8 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
         if (frame != null)
             LoadFrameResult(frame);
+
+        ClaimEnded();
     }
 
     // Utils
@@ -175,6 +180,26 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         EnrolButton.BackgroundColor = isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
         VerifyButton.BackgroundColor = !isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
         LaunchButton.Text = (isEnrol ? "Enrol" : "Verify") + " with " + (isGPA ? "GPA" : "LA");
+    }
+
+    private void UpdateProgress(double progress)
+    {
+        if (progress == 1 || progress == 0)
+        {
+            ClaimProgress.IsVisible = false;
+            ClaimProgress.Progress = 0;
+            return;
+        }
+
+        if (!ClaimProgress.IsVisible)
+            ClaimProgress.IsVisible = true;
+
+        ClaimProgress.Progress = progress;
+    }
+
+    private void ClaimEnded()
+    {
+        UpdateProgress(1);
     }
 
     private void LoadFrameResult(byte[] frame)
