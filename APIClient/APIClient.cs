@@ -27,6 +27,46 @@ namespace iProov.APIClient
         Liveness
     }
 
+    public enum ErrorType
+    {
+        InvalidImage,
+        NoToken,
+        InvalidJSON,
+        ServerError
+    }
+
+    public class Error: Exception
+    {
+        public ErrorType Type { get; }
+        public string? ServerErrorMessage { get; }
+
+        public Error(ErrorType type, string? serverErrorMessage = null)
+        {
+            Type = type;
+            ServerErrorMessage = serverErrorMessage;
+        }
+
+        public override string Message
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case ErrorType.InvalidImage:
+                        return "Invalid image";
+                    case ErrorType.NoToken:
+                        return "No token";
+                    case ErrorType.InvalidJSON:
+                        return "Invalid JSON";
+                    case ErrorType.ServerError:
+                        return ServerErrorMessage ?? "unknown";
+                    default:
+                        return base.Message;
+                }
+            }
+        }
+    }
+
     static class EnumExtensions
     {
 
@@ -119,17 +159,42 @@ namespace iProov.APIClient
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await httpClient.PostAsync($"{baseURL}/claim/{type.toInternalString()}/token", content);
-            response.EnsureSuccessStatusCode();
-
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseContent);
 
-            return (string)responseDict["token"];
+            if (responseDict == null)
+            {
+                throw new Error(type: ErrorType.InvalidJSON);
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (responseDict.TryGetValue("error_description", out var serverErrorMessageObj))
+                {
+                    string serverErrorMessage = (string)serverErrorMessageObj;
+                    throw new Error(type: ErrorType.ServerError, serverErrorMessage: serverErrorMessage);
+                }
+
+                int statusCodeAsInt = (int)response.StatusCode;
+                throw new Error(ErrorType.ServerError, serverErrorMessage: $"Unexpected status code: {statusCodeAsInt}");
+            }
+
+            if (responseDict.TryGetValue("token", out var tokenObj))
+            {
+                string token = (string)tokenObj;
+                return token;
+            }
+
+            throw new Error(type: ErrorType.NoToken);
         }
 
         public async Task<bool> EnrolPhoto(string token, byte[] jpegImage, PhotoSource source)
         {
-            var fileContent = new ByteArrayContent(jpegImage);
+            ByteArrayContent? fileContent = new ByteArrayContent(jpegImage);
+            if (fileContent == null)
+            {
+                throw new Error(type: ErrorType.InvalidImage);
+            }
 
             var multipartFormData = new MultipartFormDataContent();
             multipartFormData.Add(new StringContent(apiKey), "api_key");
@@ -142,6 +207,11 @@ namespace iProov.APIClient
             var response = await httpClient.PostAsync($"{baseURL}/claim/enrol/image", multipartFormData);
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseContent);
+
+            if (responseDict == null)
+            {
+                throw new Error(type: ErrorType.InvalidJSON);
+            }
 
             return responseDict.ContainsKey("success") && bool.Parse(responseDict["success"]);
         }
@@ -164,10 +234,25 @@ namespace iProov.APIClient
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await httpClient.PostAsync($"{baseURL}/claim/verify/validate", content);
-            response.EnsureSuccessStatusCode();
-
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseContent);
+
+            if (responseDict == null)
+            {
+                throw new Error(type: ErrorType.InvalidJSON);
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (responseDict.TryGetValue("error_description", out var serverErrorMessageObj))
+                {
+                    string serverErrorMessage = (string)serverErrorMessageObj;
+                    throw new Error(type: ErrorType.ServerError, serverErrorMessage: serverErrorMessage);
+                }
+
+                int statusCodeAsInt = (int)response.StatusCode;
+                throw new Error(ErrorType.ServerError, serverErrorMessage: $"Unexpected status code: {statusCodeAsInt}");
+            }
 
             return responseDict;
         }
@@ -197,6 +282,11 @@ namespace iProov.APIClient
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseContent);
+
+            if (responseDict == null)
+            {
+                throw new Error(type: ErrorType.InvalidJSON);
+            }
 
             return responseDict["access_token"];
         }

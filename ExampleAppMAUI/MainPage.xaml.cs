@@ -7,6 +7,8 @@ namespace ExampleAppMAUI;
 public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 {
     IProovWrapper wrapper = new IProovWrapper();
+    AssuranceType assuranceType = AssuranceType.GenuinePresence;
+    ClaimType claimType = ClaimType.Enrol;
 
     public MainPage()
 	{
@@ -21,7 +23,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        SDKversion.Text = wrapper.GetSdkVersion();
+        SDKVersionLabel.Text = "SDK Version: " + wrapper.GetSdkVersion();
     }
 
     private async void OnLaunchIProov(object sender, EventArgs e)
@@ -44,13 +46,13 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
 			try
 			{
-                var token = await apiClient.GetToken(AssuranceType.Liveness, ClaimType.Enrol, userId);
+                var token = await apiClient.GetToken(assuranceType, claimType, userId);
                 launchIProov(token, userId);
             }
             catch (Exception exception)
 			{
-				await DisplayAlert("Error", $"Exception: {exception}", "OK");
-			}
+                await DisplayAlert("Failed to get token", $"{exception.Message}", "OK");
+            }
 
         } else
 		{
@@ -60,6 +62,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
 	private void launchIProov(string token, string userId)
 	{
+        DisableControlElements();
         ClaimFrame.Source = null;
 
         var options = new IProovOptions();
@@ -77,7 +80,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
         options.enableScreenShots = false;
         options.closeButtonTintColor = Colors.Red;
-        options.closeButtonImage = ImageToByteArrayAsync("ExampleAppMAUI.Resources.Images.custom-back.png");
+        options.closeButtonImage = ImageToByteArrayAsync("ExampleAppMAUI.Resources.Images.custom_back.png");
         options.disableExteriorEffects = false;
         options.filter = new IProovOptions.LineDrawingFilter(LineDrawingFilterStyle.Vibrant);
         options.headerBackgroundColor = Colors.Yellow;
@@ -90,9 +93,33 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         options.surroundColor = Colors.SteelBlue;
     }
 
-	void onGenerateUUID(object sender, EventArgs e)
+	void OnGenerateUUID(object sender, EventArgs e)
 	{
 		UserIdEntry.Text = Guid.NewGuid().ToString();
+    }
+
+    void OnGPAButtonClicked(object sender, EventArgs e)
+    {
+        assuranceType = AssuranceType.GenuinePresence;
+        UpdateUI();
+    }
+
+    void OnLAButtonClicked(object sender, EventArgs e)
+    {
+        assuranceType = AssuranceType.Liveness;
+        UpdateUI();
+    }
+
+    void OnEnrolButtonClicked(object sender, EventArgs e)
+    {
+        claimType = ClaimType.Enrol;
+        UpdateUI();
+    }
+
+    void OnVerifyButtonClicked(object sender, EventArgs e)
+    {
+        claimType = ClaimType.Verify;
+        UpdateUI();
     }
 
     public void OnConnected()
@@ -108,11 +135,13 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     public void OnCanceled(Canceler canceler)
     {
         DisplayAlert("OnCanceled", $"Canceled by {canceler}", "OK");
+        ClaimEnded();
     }
 
     public void OnError(IProovException exception)
     {
         DisplayAlert("OnError", $"Exception: {exception.GetType}\nTitle: {exception.title} // Message: {exception.message}", "OK");
+        ClaimEnded();
     }
 
     public void OnFailure(IProovFailureResult failure)
@@ -120,11 +149,14 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         DisplayAlert("OnFailure", $"Reason: {failure.reason}\nDescription: {failure.description}", "OK");
         if (failure.frame != null)
             LoadFrameResult(failure.frame);
+
+        ClaimEnded();
     }
 
     public void OnProcessing(double progress, string? message)
     {
         Console.WriteLine($"iPROOV --- OnProcessing(progres: {progress}, message: {message})");
+        UpdateProgress(progress);
     }
 
     public void OnSuccess(byte[]? frame)
@@ -134,9 +166,59 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
         if (frame != null)
             LoadFrameResult(frame);
+
+        ClaimEnded();
     }
 
     // Utils
+
+    private void UpdateUI()
+    {
+        bool isGPA = assuranceType == AssuranceType.GenuinePresence;
+        bool isEnrol = claimType == ClaimType.Enrol;
+        GPAButton.BackgroundColor = isGPA ? Colors.RoyalBlue : Colors.DarkGray;
+        LAButton.BackgroundColor = !isGPA ? Colors.RoyalBlue : Colors.DarkGray;
+        EnrolButton.BackgroundColor = isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
+        VerifyButton.BackgroundColor = !isEnrol ? Colors.RoyalBlue : Colors.DarkGray;
+        LaunchButton.Text = (isEnrol ? "Enrol" : "Verify") + " with " + (isGPA ? "GPA" : "LA");
+    }
+
+    private void UpdateProgress(double progress)
+    {
+        if (progress == 1 || progress == 0)
+        {
+            ClaimProgress.IsVisible = false;
+            ClaimProgress.Progress = 0;
+            return;
+        }
+
+        if (!ClaimProgress.IsVisible)
+            ClaimProgress.IsVisible = true;
+
+        ClaimProgress.Progress = progress;
+    }
+
+    private void ClaimEnded()
+    {
+        UpdateProgress(1);
+        EnableControlElements();
+    }
+
+    private void EnableControlElements()
+    {
+        UserIdVerticalStackLayout.IsEnabled = true;
+        ClaimTypeVerticalStackLayout.IsEnabled = true;
+        AssuranceTypeVerticalStackLayout.IsEnabled = true;
+        LaunchButton.IsEnabled = true;
+    }
+
+    private void DisableControlElements()
+    {
+        UserIdVerticalStackLayout.IsEnabled = false;
+        ClaimTypeVerticalStackLayout.IsEnabled = false;
+        AssuranceTypeVerticalStackLayout.IsEnabled = false;
+        LaunchButton.IsEnabled = false;
+    }
 
     private void LoadFrameResult(byte[] frame)
     {
