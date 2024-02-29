@@ -11,8 +11,8 @@
 
             <Image x:Name="logoImage"
                    Source="logo.png"
-                   Margin="40"
-                   MaximumHeightRequest="150"/>
+                   Margin="0,35,0,10"
+                   MaximumHeightRequest="140"/>
 
             <VerticalStackLayout
                 Spacing="8">
