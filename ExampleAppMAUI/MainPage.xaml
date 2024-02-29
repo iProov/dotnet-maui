@@ -33,7 +33,8 @@
                                FlexLayout.Grow="1"
                                Text="Enter text"
                                VerticalTextAlignment="Center"
-                               BackgroundColor="White" />
+                               BackgroundColor="White"
+                               TextColor="Black"/>
                         <ImageButton x:Name="GenerateUUIDBtn"
                                 HeightRequest="44"
                                 WidthRequest="44"
