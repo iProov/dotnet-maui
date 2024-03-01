@@ -1,33 +1,159 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ExampleAppMAUI.MainPage">
+             x:Class="ExampleAppMAUI.MainPage"
+             Shell.NavBarIsVisible="false">
 
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            <Label x:Name="SDKversion"/>
-            <Entry x:Name="UserIdEntry"
-                Placeholder="Enter text"
-                />
+
+            <Image x:Name="logoImage"
+                   Source="logo.png"
+                   Margin="0,35,0,10"
+                   MaximumHeightRequest="140"/>
+
+            <VerticalStackLayout
+                Spacing="8"
+                x:Name="UserIdVerticalStackLayout">
+
+                <Label x:Name="UserIdLabel"
+                       Text="User ID"
+                       VerticalTextAlignment="Center"/>
+
+                <BoxView
+                    HeightRequest="1"
+                    BackgroundColor="LightGray"/>
+
+                <Border StrokeThickness="0">
+                    <FlexLayout Direction="Row" BackgroundColor="White">
+                        <Entry x:Name="UserIdEntry"
+                               FontSize="12"
+                               FontAutoScalingEnabled="True"
+                               FlexLayout.Grow="1"
+                               Text="Enter text"
+                               VerticalTextAlignment="Center"
+                               BackgroundColor="White"
+                               TextColor="Black"/>
+                        <ImageButton x:Name="GenerateUUIDBtn"
+                                HeightRequest="44"
+                                WidthRequest="44"
+                                Clicked="OnGenerateUUID"
+                                Source="reload"
+                                BackgroundColor="White"/>
+                    </FlexLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout
+                Spacing="8"
+                x:Name="ClaimTypeVerticalStackLayout">
+
+                <Label x:Name="selectClaimTypeLabel"
+                   Text="Select claim type"
+                   HorizontalOptions="Start"/>
+
+                <BoxView
+                    HeightRequest="1"
+                    BackgroundColor="LightGray"/>
+
+                <Border
+                    BackgroundColor="Transparent"
+                    StrokeThickness="0">
+                    <FlexLayout Direction="Row" BackgroundColor="Transparent">
+                        <Button
+                            x:Name="EnrolButton"
+                            FlexLayout.Grow="1"
+                            Text="Enrol" 
+                            Clicked="OnEnrolButtonClicked"
+                            HorizontalOptions="Fill"
+                            BackgroundColor="RoyalBlue"
+                            TextColor="White"
+                            WidthRequest="{Binding Path=Width, Source={x:Reference VerifyButton}}"
+                         />
+                        <BoxView
+                            WidthRequest="8"
+                            BackgroundColor="Transparent"/>
+                        <Button
+                            x:Name="VerifyButton"
+                            FlexLayout.Grow="1"
+                            Text="Verify" 
+                            Clicked="OnVerifyButtonClicked"
+                            HorizontalOptions="Fill"
+                            BackgroundColor="DarkGray"
+                            TextColor="White"
+                         />
+                    </FlexLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout
+                Spacing="8"
+                x:Name="AssuranceTypeVerticalStackLayout">
+
+                <Label x:Name="selectAssuranceTypeLabel"
+                   Text="Select assurance type"
+                   HorizontalOptions="Start"/>
+
+                <BoxView
+                    HeightRequest="1"
+                    BackgroundColor="LightGray"/>
+
+                <Border
+                    BackgroundColor="Transparent"
+                    StrokeThickness="0">
+                    <FlexLayout Direction="Row" BackgroundColor="Transparent">
+                        <Button
+                            x:Name="GPAButton"
+                            FlexLayout.Grow="1"
+                            Text="GPA" 
+                            Clicked="OnGPAButtonClicked"
+                            HorizontalOptions="Fill"
+                            BackgroundColor="RoyalBlue"
+                            TextColor="White"
+                            WidthRequest="{Binding Path=Width, Source={x:Reference VerifyButton}}"
+                         />
+                        <BoxView
+                            WidthRequest="8"
+                            BackgroundColor="Transparent"/>
+                        <Button
+                            x:Name="LAButton"
+                            FlexLayout.Grow="1"
+                            Text="LA" 
+                            Clicked="OnLAButtonClicked"
+                            HorizontalOptions="Fill"
+                            BackgroundColor="DarkGray"
+                            TextColor="White"
+                         />
+                    </FlexLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <ProgressBar
+                x:Name="ClaimProgress"
+                IsVisible="false"
+                Progress="0"
+                ProgressColor="RoyalBlue"
+            />
 
             <Button
-                x:Name="GenerateUUIDBtn"
-                Text="Generate UUID"
-                Clicked="onGenerateUUID"
-                />
-
-            <Button
-                x:Name="LaunchEnrolBtn"
-                Text="Enrol with LA" 
+                x:Name="LaunchButton"
+                Text="Enrol with GPA" 
                 Clicked="OnLaunchIProov"
-                HorizontalOptions="Fill" />
+                HorizontalOptions="Fill" 
+                BackgroundColor="RoyalBlue"
+                TextColor="White"
+                Margin="0,20,0,0"
+                HeightRequest="60"
+            />
 
             <Image x:Name="ClaimFrame"/>
 
+            <Label x:Name="SDKVersionLabel"
+               Margin="0,50,0,30"
+               HorizontalOptions="Center"
+            />
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>
-
