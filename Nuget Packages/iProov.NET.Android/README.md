@@ -6,7 +6,7 @@ The iProov.NET.Android NuGet enables you to integrate iProov's SDK into your .NE
 
 This NuGet wraps iProov's existing native [Android](https://github.com/iProov/android) SDK behind a .NET interface for use from within your .NET app.
 
-### Requirements
+## Requirements
 
 - NET 8 (net8-android)
 - Android API Level 21 (Android 5 Lollipop) and above
@@ -47,7 +47,7 @@ This NuGet wraps iProov's existing native [Android](https://github.com/iProov/an
 		{
 	   		// Either the user canceled iProov by pressing the Close button at the top right or
 			// the Home button (canceler == USER)
-			// Or the app canceled using Session.cancel() (canceler = APP).
+			// Or the app canceled using Session.cancel() (canceler == APP).
 			// You should use this to determine the next step in your flow.
 		}
 		
@@ -71,7 +71,7 @@ This NuGet wraps iProov's existing native [Android](https://github.com/iProov/an
 		public void OnProcessing(double progress, string message)
 		{
 			// The SDK will update your app with the progress of streaming to the server and authenticating
-			// the user. This will be called multiple time as the progress updates.
+			// the user. This will be called multiple times as the progress updates.
 		}
 		
 		public void OnSuccess(IProov.SuccessResult result)
@@ -113,7 +113,7 @@ This NuGet wraps iProov's existing native [Android](https://github.com/iProov/an
 	}
 	```
 
-5. You can now launch iProov by calling:
+6. Once you have obtained a token (either via the [.NET API Client](https://github.com/iProov/dotnet-maui/tree/master/APIClient) or other means), you can now launch iProov by calling:
 
 	```csharp
 	iProovLauncher.Launch(this, "wss://eu.rp.secure.iproov.me/ws", token, new IProov.Options()); // Substitute the streaming URL as appropriate

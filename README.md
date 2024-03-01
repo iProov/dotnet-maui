@@ -1,6 +1,6 @@
 ![iProov: Flexible authentication for identity assurance](images/banner.jpg)
 
-# iProov Biometrics .NET SDK
+# iProov Biometrics .NET MAUI SDK
 
 ## Table of contents
 
@@ -17,7 +17,7 @@
 
 ## Introduction
 
-The iProov .NET SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Biometric SDKs in MAUI developments. 
+The iProov .NET MAUI SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Biometric SDKs in MAUI developments. 
 
 We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your .NET app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
 
@@ -102,7 +102,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 	public void OnProcessing(double progress, string? message)
 	{
 		// The SDK updates your app with the streaming progress to the server and the user authentication.
-		// Called multiple time as the progress updates. You could update a determinate progress indicator.
+		// Called multiple times as the progress updates. You could update a determinate progress indicator.
 	}
 
 	public void OnCanceled(Canceler canceler)
@@ -147,7 +147,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 
 #### 3. Launch a Claim
 
-To launch a Claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+To launch a claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
 
  ```csharp
 	IProovWrapper wrapper = new IProovWrapper();
@@ -171,7 +171,7 @@ For iProov to work on iOS devices, you need to add a `Privacy - Camera Usage Des
 
 The `Options` class allows iProov to be customized in various ways. These can be specified by passing an instance of `IProovOptions` in the `LaunchIProov()` method.
 
-Most of these options are common to both Android and iOS, however, some are Android-only.
+Most of these options are common to both Android and iOS, however, there are some options that are platform-specific.
 
 For full documentation, please read the respective [iOS](https://github.com/iProov/ios#options) and [Android](https://github.com/iProov/android#customize-the-user-experience) native SDK documentation.
 
