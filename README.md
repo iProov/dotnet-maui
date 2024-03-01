@@ -74,7 +74,7 @@ See the [REST API documentation](https://secure.iproov.me/docs.html) for details
 
 ### Launch the SDK
 
-#### 1. Create and instance of IProovWrapper
+#### 1. Create an instance of IProovWrapper
 
  ```csharp
 	private IProovWrapper wrapper = new IProovWrapper();
