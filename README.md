@@ -306,7 +306,7 @@ You can then launch the iProov SDK with this token.
 
 ## Sample code
 
-For a simple iProov experience that is ready to run out-of-the-box, check out the [ExampleAppMAUI project](https://github.com/iProov/xamarin/tree/master/ExampleAppMAUI) for a .NET MAUI app that uses `iProov.NET.MAUI` and also makes use of the .NET API Client.
+For a simple iProov experience that is ready to run out-of-the-box, check out the [ExampleAppMAUI project](https://github.com/iProov/dotnet-maui/tree/master/ExampleAppMAUI) for a .NET MAUI app that uses `iProov.NET.MAUI` and also makes use of the .NET API Client.
 
 ### Usage
 
