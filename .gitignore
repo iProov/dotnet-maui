@@ -11,6 +11,9 @@ autom4te.cache/
 tarballs/
 test-results/
 
+# Credentials file
+ExampleAppMAUI/Credentials.cs
+
 # Mac bundle stuff
 *.dmg
 *.app
