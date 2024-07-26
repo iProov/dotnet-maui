@@ -26,8 +26,8 @@ This documentation is focused on the **iProov.NET.MAUI** package. There's also d
 ## Requirements
 
 - NET 8 (net8-android & net8-ios)
-- iOS 12 and above
-- Android API Level 21 (Android 5 Lollipop) and above
+- iOS 13 and above
+- Android API Level 26 (Android 8 Oreo) and above
 
 ## Repository contents
 
@@ -54,7 +54,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
  ```
  <ItemGroup>
-   <PackageReference Include="iProov.NET.MAUI" Version="1.1.0" />
+   <PackageReference Include="iProov.NET.MAUI" Version="2.0.0" />
  </ItemGroup>
  ```
 
@@ -109,7 +109,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 	{
 		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
 		// the app to the background. (canceler == Canceler.User)
-		// Or, the app canceled (event.canceler == Canceler.App) by canceling the claim.
+In		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
 		// You should use this to determine the next step in your flow.
 	}
 
@@ -147,7 +147,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 
 #### 3. Launch a Claim
 
-To launch a claim you need to provide a `token`, a `userId`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
 
  ```csharp
 	IProovWrapper wrapper = new IProovWrapper();
@@ -158,7 +158,7 @@ To launch a claim you need to provide a `token`, a `userId`, the websocket url o
 		var options = new IProovOptions();
 		// Here you can customize any IProovOption
 
-		wrapper.LaunchIProov(token, userId, "wss://eu.rp.secure.iproov.me/ws", listener, options);
+		wrapper.LaunchIProov(token, "wss://eu.rp.secure.iproov.me/ws", listener, options);
     }
  ```
 
@@ -166,6 +166,27 @@ To launch a claim you need to provide a `token`, a `userId`, the websocket url o
 
 For iProov to work on iOS devices, you need to add a `Privacy - Camera Usage Description` entry to your Info.plist file (`<Your_App_Folder>/Platforms/iOS/Info.plist`) with the reason why your app requires camera access (e.g. "To iProov you in order to verify your identity.")
 
+### Canceling a claim
+
+Under normal circumstances, the user will be in control of the completion of the claim, i.e. they will either complete the claim, or use the close button to cancel. In some cases, you (the integrator) may wish to cancel the iProov claim programmatically, for example in response to a timeout or change of conditions in your app.
+
+To cancel an ongoing claim, you first need to hold a reference to the `IProovWrapper` object and you can then call `Cancel()` on it.
+
+```csharp
+IProovWrapper wrapper = new IProovWrapper();
+IProovListener listener = new IProovListener();
+var options = new IProovOptions();
+
+wrapper.LaunchIProov(token, "wss://eu.rp.secure.iproov.me/ws", listener, options);
+
+// Example - cancel the wrapper session after 10 sec
+System.Timers.Timer timer = new System.Timers.Timer(10000);
+timer.Elapsed += (sender, e) => 
+{
+    wrapper.Cancel(); // Will return true if the wrapper session was successfully canceled
+};
+timer.Enabled = true;
+```
 
 ## Options
 

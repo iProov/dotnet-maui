@@ -47,7 +47,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 			try
 			{
                 var token = await apiClient.GetToken(assuranceType, claimType, userId);
-                launchIProov(token, userId);
+                launchIProov(token);
             }
             catch (Exception exception)
 			{
@@ -60,7 +60,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 		}
     }
 
-	private void launchIProov(string token, string userId)
+	private void launchIProov(string token)
 	{
         DisableControlElements();
         ClaimFrame.Source = null;
@@ -71,7 +71,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         // CustomizeOptions(options)
 
         Console.WriteLine("Launching iPROOV --- ");
-        wrapper.LaunchIProov(token, userId, Credentials.BASE_URL, this, options);
+        wrapper.LaunchIProov(token, Credentials.BASE_URL, this, options);
     }
 
     private void CustomizeOptions(IProovOptions options)
