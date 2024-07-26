@@ -1,4 +1,4 @@
-# iProov.NET.iOS Nuget
+# iProov.NET.iOS NuGet
 
 ## Introduction
 
@@ -6,15 +6,17 @@ The iProov.NET.iOS NuGet enables you to integrate iProov's SDK into your .NET iO
 
 This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) SDK behind a .NET interface for use from within your .NET app.
 
+For a more extensive documentation on iProov's .NET packages check the public GitHub repository [here](https://github.com/iProov/dotnet-maui).
+
 ## Requirements
 
 - NET 8 (net8-ios)
-- iOS 12 and above
+- iOS 13 and above
 
 
 ## How to use it
 
-1. Using the NuGet Package Manager, add the [iProov.NET.iOS](https://www.nuget.org/packages/iProov.NET.iOS/) package to your project. For further instructions on how to do this, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
+1. Using the NuGet Package Manager, add the [iProov.NET.iOS](https://www.nuget.org/packages/iProov.NET.iOS/) package to your project.
 
 2. Add a "Privacy - Camera Usage Description" entry to your Info.plist file with the reason why your app requires camera access (e.g. "To iProov you in order to verify your identity.")
 
@@ -37,7 +39,7 @@ This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) S
 		processing: (progress, message) =>
 		{
 			// The SDK will update your app with the progress of streaming to the server and authenticating
-			// the user. This will be called multiple time as the progress updates.
+			// the user. This will be called multiple times as the progress updates.
 		},
 		success: (result) =>
 		{
@@ -50,7 +52,7 @@ This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) S
 		{
 			// Either the user canceled iProov by pressing the Close button at the top left or sending
 			// the app to the background. (canceler == USER)
-			// Or the app canceled using Session.cancel() (canceler == APP).
+			// Or the app canceled using Session.cancel() (canceler == INTEGRATION).
 			// You should use this to determine the next step in your flow.
 		},
 		failure: (result) =>
@@ -71,5 +73,23 @@ This NuGet wraps iProov's existing native [iOS](https://github.com/iProov/ios) S
 	);
 	```
 > Note that the launch method requires the url to be passed as a **NSURL** 
+
+### Canceling the session
+
+Under normal circumstances, the user will be in control of the completion of the iProov scan, i.e. they will either complete the scan, or use the close button to cancel. In some cases, you (the integrator) may wish to cancel the iProov scan programmatically, for example in response to a timeout or change of conditions in your app.
+
+To cancel the session, you first need to hold a reference to the `IPSession` object (returned from `IProov.LaunchWithStreamingURL`) and you can then call `Cancel()` on it.
+
+```csharp
+IPSession session = IProov.LaunchWithStreamingURL(...)
+
+// Example - cancel the session after 10 sec
+System.Timers.Timer timer = new System.Timers.Timer(10000);
+timer.Elapsed += (sender, e) => 
+{
+    session.Cancel(); // Will return true if the session was successfully canceled
+};
+timer.Enabled = true;
+```
 	
 👉 You should now familiarise yourself with the [iProov iOS SDK documentation](https://github.com/iProov/ios) which provides comprehensive details about the available customization options and other important details regarding the iOS SDK usage.
