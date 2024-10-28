@@ -229,10 +229,18 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
     private static byte[] ImageToByteArrayAsync(string path)
     {
         var assem = Assembly.GetExecutingAssembly();
-        using var stream = assem.GetManifestResourceStream(path);
-        byte[] bytesAvailable = new byte[stream.Length];
-        stream.Read(bytesAvailable, 0, bytesAvailable.Length);
-        return bytesAvailable;
+        if (assem is not null) {
+            using var stream = assem.GetManifestResourceStream(path);
+            if(stream is not null) {
+                byte[] bytesAvailable = new byte[stream.Length];
+                stream.Read(bytesAvailable, 0, bytesAvailable.Length);
+                return bytesAvailable;
+            } else {
+                return [];
+            }
+        } else {
+            return [];
+        }
     }
 
 
