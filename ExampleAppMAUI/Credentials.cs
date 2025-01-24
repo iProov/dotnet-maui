@@ -12,8 +12,8 @@ namespace ExampleAppMAUI
         // TODO: You should update these values as required:
         public const string API_CLIENT_URL = "https://eu.rp.secure.iproov.me/api/v2";
         public const string BASE_URL = "wss://eu.rp.secure.iproov.me/ws";
-        public const string API_KEY = ""; // <YOUR API_KEY>
-        public const string SECRET = ""; // <YOUR SECRET>
+        public const string API_KEY = "342a9ecc7a38610ab08620110c6250812d2a6c1d"; // <YOUR API_KEY>
+        public const string SECRET = "cefd2abf7aa3be084e1e8892fbdd262eb1553d03"; // <YOUR SECRET>
 
     }
 }
