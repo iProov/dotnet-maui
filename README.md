@@ -21,7 +21,7 @@ The iProov .NET MAUI SDK enables you to integrate iProov into your .NET Android 
 
 We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your .NET app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
 
-This documentation is focused on the **iProov.NET.MAUI** package. There's also documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Nuget%20Packages/iProov.NET.iOS/) packages.
+This documentation is focused on the **iProov.NET.MAUI** package. There's also documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Documentation/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Documentation/iProov.NET.iOS/) packages.
 
 ## Requirements
 
@@ -331,9 +331,9 @@ For a simple iProov experience that is ready to run out-of-the-box, check out th
 
 ### Usage
 
-1. Set your API key & secret in the Credentials.cs file.
-2. Open the ExampleAppMAUI solution in Visual Studio.
-3. Right click the root project and "Restore NuGet Packages" to ensure all NuGet packages are ready for usage.
+1. Rename `Credentials.example.cs` to `Credentials.cs` and update with your Base URL, API Key and Secret. You can obtain these credentials from [iProov Portal](https://portal.iproov.com/)
+2. Open the ExampleAppMAUI solution in Visual Studio / VS Code.
+3. Restore NuGet Packages to ensure all NuGet packages are ready for usage.
 4. Run the ExampleAppMAUI project on a supported iOS or Android device.
 
 > NOTE: iProov is not supported on the iOS or Android simulator, you must use a physical device in order to iProov.
