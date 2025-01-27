@@ -332,8 +332,8 @@ For a simple iProov experience that is ready to run out-of-the-box, check out th
 ### Usage
 
 1. Rename `Credentials.example.cs` to `Credentials.cs` and update with your Base URL, API Key and Secret. You can obtain these credentials from [iProov Portal](https://portal.iproov.com/)
-2. Open the ExampleAppMAUI solution in Visual Studio.
-3. Right click the root project and "Restore NuGet Packages" to ensure all NuGet packages are ready for usage.
+2. Open the ExampleAppMAUI solution in Visual Studio / VS Code.
+3. Restore NuGet Packages to ensure all NuGet packages are ready for usage.
 4. Run the ExampleAppMAUI project on a supported iOS or Android device.
 
 > NOTE: iProov is not supported on the iOS or Android simulator, you must use a physical device in order to iProov.
