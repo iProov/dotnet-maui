@@ -75,7 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="iProov.NET.MAUI" Version="2.1.0" />
+	  <PackageReference Include="iProov.NET.MAUI" Version="2.2.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\APIClient\APIClient.csproj" />

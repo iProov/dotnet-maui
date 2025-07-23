@@ -54,7 +54,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
  ```
  <ItemGroup>
-   <PackageReference Include="iProov.NET.MAUI" Version="2.1.0" />
+   <PackageReference Include="iProov.NET.MAUI" Version="2.2.0" />
  </ItemGroup>
  ```
 
@@ -223,6 +223,8 @@ A summary of the support for the various SDK options in **iProov.NET.MAUI** is p
 |**`genuinePresenceAssurance`** | `GenuinePresenceAssurance?` |  |  |
 | ↳ `readyOvalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `notReadyOvalStrokeColor` | `Color?` | ✅ | ✅ |
+| ↳ `controlYPosition` | `bool?` | ✅ | ✅ |
+| ↳ `scanningPrompts` | `bool?` | ✅ | ✅ |
 |**`livenessAssurance`** | `LivenessAssurance?` |  |  |
 | ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `completedOvalStrokeColor` | `Color?` | ✅ | ✅ |
