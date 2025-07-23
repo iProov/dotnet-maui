@@ -54,7 +54,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
  ```
  <ItemGroup>
-   <PackageReference Include="iProov.NET.MAUI" Version="2.1.0" />
+   <PackageReference Include="iProov.NET.MAUI" Version="2.2.0" />
  </ItemGroup>
  ```
 
