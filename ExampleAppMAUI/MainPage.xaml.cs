@@ -68,7 +68,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         var options = new IProovOptions();
 
         // Options can be customised as shown in the CustomizeOptions method
-        // CustomizeOptions(options)
+        // CustomizeOptions(options);
 
         Console.WriteLine("Launching iPROOV --- ");
         wrapper.LaunchIProov(token, Credentials.BASE_URL, this, options);
@@ -84,13 +84,22 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         options.disableExteriorEffects = false;
         options.filter = new IProovOptions.LineDrawingFilter(LineDrawingFilterStyle.Vibrant);
         options.headerBackgroundColor = Colors.Yellow;
-        options.livenessAssurance = new IProovOptions.LivenessAssurance(ovalStrokeColor: Colors.Beige, completedOvalStrokeColor: Colors.DarkGreen);
         options.promptBackgroundColor = Colors.White;
         options.promptRoundedCorners = true;
         options.promptTextColor = Colors.DarkSlateGray;
         options.title = "Example MAUI";
         options.titleTextColor = Colors.DarkViolet;
         options.surroundColor = Colors.SteelBlue;
+        options.livenessAssurance = new IProovOptions.LivenessAssurance(
+            ovalStrokeColor: Colors.Beige,
+            completedOvalStrokeColor: Colors.DarkGreen);
+        options.genuinePressenceAssurance = new IProovOptions.GenuinePressenceAssurance(
+            notReadyColor: Colors.LightBlue,
+            readyColor: Colors.YellowGreen,
+            controlYPosition: true,
+            controlXPosition: true,
+            scanningPrompts: true);
+
     }
 
 	void OnGenerateUUID(object sender, EventArgs e)
