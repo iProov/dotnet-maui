@@ -224,6 +224,7 @@ A summary of the support for the various SDK options in **iProov.NET.MAUI** is p
 | ↳ `readyOvalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `notReadyOvalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `controlYPosition` | `bool?` | ✅ | ✅ |
+| ↳ `controlXPosition` | `bool?` | ✅ | ✅ |
 | ↳ `scanningPrompts` | `bool?` | ✅ | ✅ |
 |**`livenessAssurance`** | `LivenessAssurance?` |  |  |
 | ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
