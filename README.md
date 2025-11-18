@@ -109,7 +109,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 	{
 		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
 		// the app to the background. (canceler == Canceler.User)
-In		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
+		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
 		// You should use this to determine the next step in your flow.
 	}
 
@@ -148,22 +148,55 @@ In		// Or, the app canceled (event.canceler == Canceler.Integration) by cancelin
 	}
 }
  ```
+##### 2.1 Listening to UIStates (Optional)
+
+To monitor the state of the iProov UI you need an instance of the `IProovWrapper.IUIStateListener` interface. You will have to implement this interface in one of your classes, or create a new one like in the following example.
+```csharp
+public class IProovUIListener: IProovWrapper.IUIListener
+{
+
+    public void OnNotStarted()
+    {
+      // Called when the session has started
+      // but the UI hasn't
+    }
+
+    public void OnStarted()
+    {
+      // Called when the UI Starts
+    }
+
+    public void OnEnded()
+    {
+      // Called when the UI is dismissed
+    }
+}
+```
+
+Listening to these events is not necessary to use the iProov SDK. Nevertheless, if you want to monitor the UI states, the next section shows how to use it.
 
 #### 3. Launch a Claim
 
-To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience. Also if you want to monitor the UI states you can provide an instance of `IUIStateListener`.
 
  ```csharp
 	IProovWrapper wrapper = new IProovWrapper();
 	IProovListener listener = new IProovListener();
+	// Optional: Use it to monitor UI state
+	IProovUIListener uiListener = new IProovUIListener();
 
 	private void launchIProov(string token, string userId)
 	{
 		var options = new IProovOptions();
 		// Here you can customize any IProovOption
 
-		wrapper.LaunchIProov(token, "wss://eu.rp.secure.iproov.me/ws", listener, options);
-    }
+		wrapper.LaunchIProov(
+		   Token: token,
+		   WebsocketURL: "wss://eu.rp.secure.iproov.me/ws",
+		   Listener: listener,
+		   Options: options, // optional
+		   UiListnener: uiListener // optional
+		);
  ```
 
 #### _\** Running on iOS_

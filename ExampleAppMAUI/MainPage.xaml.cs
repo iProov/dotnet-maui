@@ -1,10 +1,14 @@
 ﻿using System.Reflection;
 using iProov.APIClient;
 using iProov.NET.MAUI;
+#if ANDROID
+using Android.App;
+using Android.Content.Res;
+#endif
 
 namespace ExampleAppMAUI;
 
-public partial class MainPage : ContentPage, IProovWrapper.IStateListener
+public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProovWrapper.IUIStateListener
 {
     IProovWrapper wrapper = new IProovWrapper();
     AssuranceType assuranceType = AssuranceType.GenuinePresence;
@@ -71,7 +75,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         // CustomizeOptions(options);
 
         Console.WriteLine("Launching iPROOV --- ");
-        wrapper.LaunchIProov(token, Credentials.BASE_URL, this, options);
+        wrapper.LaunchIProov(token, Credentials.BASE_URL, this, options, this);
     }
 
     private void CustomizeOptions(IProovOptions options)
@@ -131,6 +135,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         UpdateUI();
     }
 
+    // --- IStateListener methods ---
     public void OnConnected()
     {
         Console.WriteLine("iPROOV --- Connected");
@@ -155,7 +160,8 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
     public void OnFailure(IProovFailureResult failure)
     {
-        DisplayAlert("OnFailure", $"Reason: {failure.reason}\nDescription: {failure.description}", "OK");
+        var displayText = GetFailureReasonsAsString(failure.reasons);
+        DisplayAlert("OnFailure", displayText, "OK");
         if (failure.frame != null)
             LoadFrameResult(failure.frame);
 
@@ -178,6 +184,25 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
 
         ClaimEnded();
     }
+    // -------------------------
+
+    // --- IUIStateListener methods ---
+    public void OnNotStarted()
+    {
+        Console.WriteLine("iProovUIState --- Not Started");
+    }
+
+    public void OnStarted()
+    {
+        Console.WriteLine("iProovUIState --- Started");
+    }
+
+    public void OnEnded()
+    {
+        Console.WriteLine("iProovUIState --- Ended");
+    }
+    
+    // --------------------------------
 
     // Utils
 
@@ -252,7 +277,40 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener
         }
     }
 
+    public string GetFailureReasonsAsString(IProovFailureReason[] reasons)
+    {
+        #if ANDROID
+        return String.Join("\n", reasons.Select(elem => GetAndroidString(elem.descriptionId)));
+        #else
+        return String.Join("\n", reasons.Select(elem => elem.description));
+        #endif
+    }
 
+    public string GetAndroidString(int resourceId)
+    {
+        #if ANDROID
+        // 1. Get the current Android Context
+        Android.Content.Context context = Platform.CurrentActivity ?? Android.App.Application.Context;
+    
+        // 2. Access the Resources object
+        Resources resources = context.Resources;
+
+        try
+        {
+            // 3. Retrieve the string using the resource ID
+            return resources.GetString(resourceId);
+        }
+        catch (Resources.NotFoundException)
+        {
+            // Handle cases where the resource ID is invalid or not found
+            System.Diagnostics.Debug.WriteLine($"Error: Android resource ID {resourceId} not found.");
+            return $"Resource ID {resourceId} Not Found";
+        }
+        #else
+        // Return an empty string or default value if not running on Android
+        return string.Empty;
+        #endif
+    }
 }
 
 
