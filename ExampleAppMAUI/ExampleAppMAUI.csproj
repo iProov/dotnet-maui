@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
+		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ExampleAppMAUI</RootNamespace>
@@ -20,7 +20,7 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">13.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
@@ -75,7 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="iProov.NET.MAUI" Version="2.3.0" />
+	  <PackageReference Include="iProov.NET.MAUI" Version="3.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\APIClient\APIClient.csproj" />

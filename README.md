@@ -1,6 +1,6 @@
 ![iProov: Flexible authentication for identity assurance](images/banner.jpg)
 
-# iProov Biometrics .NET MAUI SDK
+# iProov Face .NET MAUI SDK
 
 ## Table of contents
 
@@ -17,7 +17,7 @@
 
 ## Introduction
 
-The iProov .NET MAUI SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Biometric SDKs in MAUI developments. 
+The iProov .NET MAUI SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Face SDKs in MAUI developments. 
 
 We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your .NET app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
 
@@ -25,8 +25,8 @@ This documentation is focused on the **iProov.NET.MAUI** package. There's also d
 
 ## Requirements
 
-- NET 8 (net8-android & net8-ios)
-- iOS 13 and above
+- NET 9 (net9-android & net9-ios)
+- iOS 15 and above
 - Android API Level 26 (Android 8 Oreo) and above
 
 ## Repository contents
@@ -54,7 +54,7 @@ The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.o
 
  ```
  <ItemGroup>
-   <PackageReference Include="iProov.NET.MAUI" Version="2.2.0" />
+   <PackageReference Include="iProov.NET.MAUI" Version="3.0.0" />
  </ItemGroup>
  ```
 
@@ -109,7 +109,7 @@ public class IProovListener: IProovWrapper.IStateListener {
 	{
 		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
 		// the app to the background. (canceler == Canceler.User)
-In		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
+		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
 		// You should use this to determine the next step in your flow.
 	}
 
@@ -128,11 +128,15 @@ In		// Or, the app canceled (event.canceler == Canceler.Integration) by cancelin
 		// The user was not successfully verified/enrolled as their identity could not be verified.
 		// Or there was another issue with their verification/enrollment.
 		// You might provide feedback to the user as to how to retry. 
-		// A FailureReason value is provided to identify the reason as to why the claim failed. Some reasons also provide an optional description (as a string).
-		// When enabled for your service provider, failure.frame contains the bytes of an image containing a single frame of the user
+		// An IProovFailureResult provides an array of IProovFailureReason as to why the claim failed.
+		// Each IProovFailureReason contains:
+		//   - FailureReason value to identify a reason 
+		//   - Optional description (as a string on iOS and as a resource ID on Android) that can be 
+		//     presented to the user to increase their chances of iProoving successfully next time.
+		// When enabled for your service provider, failure.frame contains the bytes of an image containing 
+		// a single frame of the user
 
-		FailureReason reason = failure.reason;
-		string? description = failure.description;
+		IProovFailureReason[] reasons = failure.reasons;
 		byte[]? frame = failure.frame;
 	}
 
@@ -144,22 +148,55 @@ In		// Or, the app canceled (event.canceler == Canceler.Integration) by cancelin
 	}
 }
  ```
+##### 2.1 Listening to UIStates (Optional)
+
+To monitor the state of the iProov UI you need an instance of the `IProovWrapper.IUIStateListener` interface. You will have to implement this interface in one of your classes, or create a new one like in the following example.
+```csharp
+public class IProovUIListener: IProovWrapper.IUIListener
+{
+
+    public void OnNotStarted()
+    {
+      // Called when the session has started
+      // but the UI hasn't
+    }
+
+    public void OnStarted()
+    {
+      // Called when the UI Starts
+    }
+
+    public void OnEnded()
+    {
+      // Called when the UI is dismissed
+    }
+}
+```
+
+Listening to these events is not necessary to use the iProov SDK. Nevertheless, if you want to monitor the UI states, the next section shows how to use it.
 
 #### 3. Launch a Claim
 
-To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience.
+To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience. Also if you want to monitor the UI states you can provide an instance of `IUIStateListener`.
 
  ```csharp
 	IProovWrapper wrapper = new IProovWrapper();
 	IProovListener listener = new IProovListener();
+	// Optional: Use it to monitor UI state
+	IProovUIListener uiListener = new IProovUIListener();
 
 	private void launchIProov(string token, string userId)
 	{
 		var options = new IProovOptions();
 		// Here you can customize any IProovOption
 
-		wrapper.LaunchIProov(token, "wss://eu.rp.secure.iproov.me/ws", listener, options);
-    }
+		wrapper.LaunchIProov(
+		   Token: token,
+		   WebsocketURL: "wss://eu.rp.secure.iproov.me/ws",
+		   Listener: listener,
+		   Options: options, // optional
+		   UiListnener: uiListener // optional
+		);
  ```
 
 #### _\** Running on iOS_
@@ -215,7 +252,6 @@ A summary of the support for the various SDK options in **iProov.NET.MAUI** is p
 | `timeout` | `int?` | ✅ | ✅ |
 | `enableScreenshots` | `bool?` |  | ✅ |
 | `orientation` | `Orientation?` |  | ✅ |
-| `camera` | `Camera?` |  | ✅ |
 | `headerBackgroundColor` | `Color?` | ✅ | ✅ |
 | `disableExteriorEffects` | `bool?` | ✅ | ✅ |
 | `stringsTable` | `string?` | ✅ | |
@@ -229,6 +265,30 @@ A summary of the support for the various SDK options in **iProov.NET.MAUI** is p
 |**`livenessAssurance`** | `LivenessAssurance?` |  |  |
 | ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
 | ↳ `completedOvalStrokeColor` | `Color?` | ✅ | ✅ |
+
+### Certificate Pinning
+
+If you are using your own reverse-proxy, you will need to use this option to pin to your own certificates.
+
+Certificates should be passed as a `String`, which is base64-encoded SHA-256 hash of a certificate's Subject Public Key Info. You can load a certificate as follows:
+
+```csharp
+options.certificates = new List<String>{"O8qZKEXWWkMPISIpvB7DUow++JzIW2g+k9z3U/l5V94=", "Sc7wL4FfOw8ued5w3JOSzu5MzB471PfqdyN4hnMYbX4="}
+```
+
+To get Subject Public Key Info from a `.crt`, use the following command:
+
+```sh
+$ openssl x509  -in cert.crt -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+```
+
+To get Subject Public Key Info from a `.der`, use the following command:
+
+```sh
+$ openssl x509 -inform der -in cert.der -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
+```
+
+When multiple certificates are passed, as long as the server matches **any** of the certificates, the connection will be allowed. Pinning is performed against the **whole** of the certificate.
 
 ### Filter Options
 
@@ -265,7 +325,53 @@ options.filter = new IProovOptions.NaturalFilter(style: NaturalFilterStyle.Clear
 
 > **Note**: `NaturalFilter` is available for Liveness Assurance claims only. Attempts to use `NaturalFilter` for Genuine Presence Assurance claims will result in an error.
 
-## Handling errors
+## Failures and Errors
+
+### Failures
+
+Failures occur when the user's identity could not be verified. A failure means that the capture was successfully received and processed by the server, which returned a result. Crucially, this differs from an error, where the capture itself failed due to a system failure.
+
+The failure results in an `IProovFailureResult`, which contains a property named `reasons` that is a list of `IProovFailureReason`. An `IProovFailureReason` has the following properties:
+    - `reason` - Of type `FailureReason`, which is an enum that represents the feedback code.
+    - `description` - `string?` that contains a human readable description of the reason of failure. Only returned when running on iOS.
+	- `descriptionId` - `int` with the string resource ID for the human readable description of the reason of failure. Only returned when running on Android.
+	
+>You should present the `description` to the user as it may provide an informative hint for the user to increase their chances of iProoving successfully next time.
+
+The available `FailureReason` values for claims are as follows:
+
+| `FailureReason` value | `description` (English)                | GPA | LA |
+|-----------------------|----------------------------------------|---|---|
+| `Unknown`             | Try again                              | ✅ | ❌ |
+| `TooMuchMovement`   | Keep still                             | ✅ | ❌ |
+| `TooBright`          | Move somewhere darker                  | ✅ | ❌ |
+| `TooDark`            | Move somewhere brighter                | ✅ | ❌ |
+| `MisalignedFace`     | Keep your face in the oval             | ✅ | ❌ |
+| `FaceTooFar`        | Move your face closer to the screen    | ✅ | ❌ |
+| `FaceTooClose`      | Move your face farther from the screen | ✅ | ❌ |
+| `Sunglasses`          | Remove sunglasses                      | ✅ | ❌ |
+| `ObscuredFace`       | Remove any face coverings              | ✅ | ✅ |
+| `EyesClosed`         | Keep your eyes open                    | ✅ | ✅ |
+| `MultipleFaces`      | Ensure only one person is visible      | ✅️ | ✅️ |
+| `BackgroundIssue`    | Move to a different location with a neutral background. | ⚠️ | ✅ |
+| `DeviceIssue`        | Try a different device. | ⚠️ | ✅ |
+| `Eyewear`             | Remove your eyewear. | ⚠️ | ✅ |
+| `FaceNotFound`      | Align your face in the oval and then try to keep still. | ⚠️ | ✅ |
+| `FramesBlurry`       | Align your face in the oval and then try to keep still. Please try again. | ⚠️ | ✅ |
+| `MotionIssue`        | Try a different device. | ⚠️ | ✅ |
+| `LightingIssues`     | Make sure your face is well lit and free from glare. | ⚠️ | ✅ |
+| `Rejected`            | Transaction could not be completed. | ⚠️ | ✅ |
+| `SystemError`        | System error. | ⚠️ | ✅ |
+| `Timeout`             | System timeout. | ⚠️ | ✅ |
+| `UserNotFound`      | Transaction could not be completed. | ⚠️ | ✅ |
+| `DeviceRestart`      | Please restart your device and try again. | ⚠️ | ✅ |
+| `ProcessingFault`    | Please try again. | ⚠️ | ✅ |
+
+Key: ✅ = will be returned, ❌ = will not be returned, ⚠️ = may be returned in the future
+
+These are not an indication of tests being performed but only whether reasons of failure are reported.
+
+### Errors
 
 All errors from the native SDKs are re-mapped to `IProovException` exceptions:
 
@@ -280,7 +386,6 @@ All errors from the native SDKs are re-mapped to `IProovException` exceptions:
 | `ListenerNotRegisteredException`  |     | ✅       | The SDK was launched before a listener was registered.                                                                           |
 | `MultiWindowUnsupportedException` |     | ✅       | The user attempted to iProov in split-screen/multi-screen mode, which is not supported.                                          |
 | `CameraException`                 |     | ✅       | An error occurred acquiring or using the camera. This could happen when a non-phone is used with/without an external/USB camera. |
-| `FaceDetectorException`           |     | ✅       | An error occurred with the face detector.                                                                                        |
 | `InvalidOptionsException`         |     | ✅       | An error occurred when trying to apply your options.|
 | `UserTimeoutException`         |✅   |          | The user has taken too long to complete the claim.|
 
