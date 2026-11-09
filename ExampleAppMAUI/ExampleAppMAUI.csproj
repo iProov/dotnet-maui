@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>ExampleAppMAUI</RootNamespace>
@@ -14,39 +14,22 @@
 		<ApplicationTitle>ExampleAppMAUI</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.iproov.exampleappmaui</ApplicationId>
+		<ApplicationId>com.iproov.maui.exampleapp</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">16.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
+		<!-- Restore iOS for both iPhone and simulator, so a build or a clean for either works
+		     whichever one restored last. Set only where restore reads it: listing both in the
+		     iOS build itself makes the iOS SDK treat an iPhone build as a simulator one. -->
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == ''">ios-arm64;iossimulator-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
-	  <DeviceSpecificBuild>true</DeviceSpecificBuild>
-	  <MtouchVerbosity>2</MtouchVerbosity>
-	  <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-	  <CreatePackage>true</CreatePackage>
-	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 	  <WarningLevel>4</WarningLevel>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-	  <AndroidManifest>AndroidManifest.xml</AndroidManifest>
-	  <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-	  <DebugSymbols>true</DebugSymbols>
-      <DebugType>portable</DebugType>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <AndroidManifest>AndroidManifest.xml</AndroidManifest>
-	  <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-	  <DebugSymbols>false</DebugSymbols>
-      <DebugType>None</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
@@ -64,21 +47,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="Microsoft.MAUI.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-	  <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.3.0.1" />
-	  <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.3.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="iProov.NET.MAUI" Version="3.0.0" />
+	  <PackageReference Include="iProov.NET.MAUI" Version="4.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\APIClient\APIClient.csproj" />
+	</ItemGroup>
+	<!-- The template for Credentials.cs, which holds the real values and is not committed. -->
+	<ItemGroup>
+	  <Compile Remove="Credentials.example.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Resources\Images\custom_back.png" />
@@ -86,7 +67,7 @@
 	  <None Remove="Resources\Images\logo.png" />
 	</ItemGroup>
 	<ItemGroup>
-	  <MauiImage Include="Resources\Images\custom_back.png" />
+	  <EmbeddedResource Include="Resources\Images\custom_back.png" />
 	  <MauiImage Include="Resources\Images\reload.png" />
 	  <MauiImage Include="Resources\Images\logo.png" />
 	</ItemGroup>

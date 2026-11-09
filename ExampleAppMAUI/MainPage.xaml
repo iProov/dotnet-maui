@@ -32,7 +32,7 @@
                                FontSize="12"
                                FontAutoScalingEnabled="True"
                                FlexLayout.Grow="1"
-                               Text="Enter text"
+                               Placeholder="Enter a user ID"
                                VerticalTextAlignment="Center"
                                BackgroundColor="White"
                                TextColor="Black"/>
@@ -147,8 +147,6 @@
                 Margin="0,20,0,0"
                 HeightRequest="60"
             />
-
-            <Image x:Name="ClaimFrame"/>
 
             <Label x:Name="SDKVersionLabel"
                Margin="0,50,0,30"

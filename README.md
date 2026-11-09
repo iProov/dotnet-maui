@@ -2,446 +2,60 @@
 
 # iProov Face .NET MAUI SDK
 
-## Table of contents
-
-- [Introduction](#introduction)
-- [Requirements](#requirements)
-- [Repository contents](#repository-contents)
-- [Registration](#registration)
-- [Installation](#installation)
-- [Get Started](#get-started)
-- [Options](#options)
-- [Handling Errors](#handling-errors)
-- [API Client](#api-client)
-- [Sample code](#sample-code)
-
 ## Introduction
 
-The iProov .NET MAUI SDK enables you to integrate iProov into your .NET Android / iOS / MAUI projects. The iProov's native SDK for [iOS](https://github.com/iProov/ios) (Swift) and [Android](https://github.com/iProov/android) (Java / Kotlin) are wrapped behind a .NET interface for their use within .NET apps. Given the differences in the implementation between these .NET interfaces, the iProov.NET.MAUI wraps both interfaces into a unified .NET version of the iProov API to ease the integration of the iProov Face SDKs in MAUI developments. 
+The iProov .NET MAUI SDK lets you integrate iProov into your .NET MAUI, .NET for Android and .NET for iOS apps. It is distributed as three packages on nuget.org:
 
-We also provide a .NET API Client written in C# to call our [REST API v2](https://eu.rp.secure.iproov.me/docs.html) from a .NET Standard Library, which can be used from your .NET app to request tokens directly from the iProov API (note that this is not a secure way of getting tokens, and should only be used for demo/debugging purposes).
+| Package | What it is | Guide |
+|---|---|---|
+| [iProov.NET.MAUI](https://www.nuget.org/packages/iProov.NET.MAUI/) | A unified .NET MAUI API over the iOS and Android SDKs | [iProov.NET.MAUI](iProov.NET.MAUI/README.md) |
+| [iProov.NET.Android](https://www.nuget.org/packages/iProov.NET.Android/) | .NET bindings for the iProov Android SDK | [iProov.NET.Android](iProov.NET.Android/README.md) |
+| [iProov.NET.iOS](https://www.nuget.org/packages/iProov.NET.iOS/) | .NET bindings for the iProov iOS SDK | [iProov.NET.iOS](iProov.NET.iOS/README.md) |
 
-This documentation is focused on the **iProov.NET.MAUI** package. There's also documentation available for [iProov.NET.Android](https://github.com/iProov/dotnet-maui/tree/master/Documentation/iProov.NET.Android/) and [iProov.NET.iOS](https://github.com/iProov/dotnet-maui/tree/master/Documentation/iProov.NET.iOS/) packages.
+Most apps only need iProov.NET.MAUI, which brings in the other two.
 
-## Requirements
+## Repository Contents
 
-- NET 9 (net9-android & net9-ios)
-- iOS 15 and above
-- Android API Level 26 (Android 8 Oreo) and above
+This repository contains the following:
 
-## Repository contents
+* **ExampleAppMAUI** - A basic .NET MAUI app using iProov.NET.MAUI and the API client.
+* **APIClient** - The source code of a .NET client for iProov's REST API v2, used by the example app to get tokens.
+* **iProov.NET.MAUI**, **iProov.NET.Android**, **iProov.NET.iOS** - The integration guide for each package, also shown on its nuget.org page.
+* **dotnet-maui.sln** - A solution containing the example app and the API client.
 
-The iProov .NET MAUI SDK is provided via this repository, which contains the following:
+## Upgrading from Earlier Versions
 
-- **README.md** - This document
-- **NuGet Packages** - Folder containing the NuGet packages for iProov.NET.Android, iProov.NET.iOS & iProov.NET.MAUI
-- **APIClient** - C# project with the source code for the .NET API Client
-- **ExampleAppMAUI** - Sample code demonstrating use of the iProov.NET.MAUI together with the .NET API Client
+If you're already using an older version of the SDK, see [Upgrading from 3.x](iProov.NET.MAUI/README.md#upgrading-from-3x) in the iProov.NET.MAUI guide.
 
 ## Registration
 
-You can obtain API credentials by registering on the [iProov Partner Portal](https://www.iproov.net).
+You can obtain API credentials by registering on the [iProov Portal](https://portal.iproov.com/).
 
-## Installation
+## Example Project
 
-The **iProov.NET.MAUI** library is available at [nugets.org](https://www.nuget.org/packages/iProov.NET.MAUI/). Hence, you can add the package to your project either:
+For a simple iProov experience that is ready to run out-of-the-box, check out [ExampleAppMAUI](ExampleAppMAUI), a .NET MAUI app that integrates iProov.NET.MAUI and uses the API client to get tokens. It needs the same tools as the packages: see [Requirements](iProov.NET.MAUI/README.md#requirements) in the iProov.NET.MAUI guide.
 
-1. Using the NuGet Package Manager, and adding the iProov.NET.MAUI package to your project from there. For further instructions on how to install and manage packages, [see here](https://learn.microsoft.com/en-us/nuget/consume-packages/install-use-packages-visual-studio).
+### Installation
 
-> If you want to use the nuget package from a local source, make sure to add the folder where you store the nuget packages as a Nuget source in Visual Studio > Preferences
+1. In the `ExampleAppMAUI` folder, copy `Credentials.example.cs` to `Credentials.cs` and update it with your API key, secret and URLs. You can obtain these credentials from the [iProov Portal](https://portal.iproov.com/).
 
-2. Or edit your `.csproj` file and add the `<PackageReference>` to the `iProov.NET.MAUI` package
+2. Open `dotnet-maui.sln`, then build and run the `ExampleAppMAUI` project on a real device.
 
- ```
- <ItemGroup>
-   <PackageReference Include="iProov.NET.MAUI" Version="3.0.0" />
- </ItemGroup>
- ```
-
-## Get Started
-
-### Get a Token
-
-There are two types of tokens:
-
-- A **verify** token for logging in an existing user
-- An **enrol** token for registering a new user
-
-See the [REST API documentation](https://secure.iproov.me/docs.html) for details about how to generate tokens.
-
-> **TIP:** In a production app you typically obtain tokens via a server-to-server back-end call. For demos and testing, iProov provides .NET sample code for obtaining tokens via [iProov API v2](https://eu.rp.secure.iproov.me/docs.html) with our open-source [API Client](https://github.com/iProov/dotnet-maui/tree/master/APIClient).
-
-
-### Launch the SDK
-
-#### 1. Create an instance of IProovWrapper
-
- ```csharp
-	private IProovWrapper wrapper = new IProovWrapper();
- ```
-
-#### 2. Listening to IProovStates
-
-To monitor the progress of an iProov claim and receive the result you need an instance of `IProovWrapper.IStateListener` interface. So, you will have to implement this interface in one of your classes, or create a new one, as shown in the following example.
-
- ```csharp
-public class IProovListener: IProovWrapper.IStateListener {
-
-	public void OnConnecting()
-	{
-		// Called when the SDK is connecting to the server. You could provide an indeterminate
-		// progress indication to let the user know that the connection is being established.
-	}
-
-	public void OnConnected()
-	{
-		// The SDK has connected and the iProov user interface is now displayed. You
-		// could hide any progress indicator at this point.
-	}
-
-	public void OnProcessing(double progress, string? message)
-	{
-		// The SDK updates your app with the streaming progress to the server and the user authentication.
-		// Called multiple times as the progress updates. You could update a determinate progress indicator.
-	}
-
-	public void OnCanceled(Canceler canceler)
-	{
-		// The user canceled iProov, either by pressing the close button at the top of the screen, or sending
-		// the app to the background. (canceler == Canceler.User)
-		// Or, the app canceled (event.canceler == Canceler.Integration) by canceling the claim.
-		// You should use this to determine the next step in your flow.
-	}
-
-	public void OnError(IProovException exception)
-	{
-		// The user was not successfully verified/enrolled due to an error (e.g. lost internet connection).
-		// You will be provided with an Exception (see below).
-		// It will be called once, or never.
-		// An IProovException contains a title that describes the exception, and may also contain a message.
-		string title = exception.title;
-		string? message = exception.message;
-	}
-
-	public void OnFailure(IProovFailureResult failure)
-	{
-		// The user was not successfully verified/enrolled as their identity could not be verified.
-		// Or there was another issue with their verification/enrollment.
-		// You might provide feedback to the user as to how to retry. 
-		// An IProovFailureResult provides an array of IProovFailureReason as to why the claim failed.
-		// Each IProovFailureReason contains:
-		//   - FailureReason value to identify a reason 
-		//   - Optional description (as a string on iOS and as a resource ID on Android) that can be 
-		//     presented to the user to increase their chances of iProoving successfully next time.
-		// When enabled for your service provider, failure.frame contains the bytes of an image containing 
-		// a single frame of the user
-
-		IProovFailureReason[] reasons = failure.reasons;
-		byte[]? frame = failure.frame;
-	}
-
-	public void OnSuccess(byte[]? frame)
-	{
-		// The user was successfully verified/enrolled.
-		// You must always independently validate the token server-side (using the /validate API call) before performing any authenticated user actions.
-		// When enabled for your service provider, frame contains the bytes of an image containing a single frame of the user
-	}
-}
- ```
-##### 2.1 Listening to UIStates (Optional)
-
-To monitor the state of the iProov UI you need an instance of the `IProovWrapper.IUIStateListener` interface. You will have to implement this interface in one of your classes, or create a new one like in the following example.
-```csharp
-public class IProovUIListener: IProovWrapper.IUIListener
-{
-
-    public void OnNotStarted()
-    {
-      // Called when the session has started
-      // but the UI hasn't
-    }
-
-    public void OnStarted()
-    {
-      // Called when the UI Starts
-    }
-
-    public void OnEnded()
-    {
-      // Called when the UI is dismissed
-    }
-}
-```
-
-Listening to these events is not necessary to use the iProov SDK. Nevertheless, if you want to monitor the UI states, the next section shows how to use it.
-
-#### 3. Launch a Claim
-
-To launch a claim you need to provide a `token`, the websocket url of the service provider you are using and an `IStateListener` instance. Additionally you can provide an instance of `IProovOptions` (see [below](#options)) to customize the user experience. Also if you want to monitor the UI states you can provide an instance of `IUIStateListener`.
-
- ```csharp
-	IProovWrapper wrapper = new IProovWrapper();
-	IProovListener listener = new IProovListener();
-	// Optional: Use it to monitor UI state
-	IProovUIListener uiListener = new IProovUIListener();
-
-	private void launchIProov(string token, string userId)
-	{
-		var options = new IProovOptions();
-		// Here you can customize any IProovOption
-
-		wrapper.LaunchIProov(
-		   Token: token,
-		   WebsocketURL: "wss://eu.rp.secure.iproov.me/ws",
-		   Listener: listener,
-		   Options: options, // optional
-		   UiListnener: uiListener // optional
-		);
- ```
-
-#### _\** Running on iOS_
-
-For iProov to work on iOS devices, you need to add a `Privacy - Camera Usage Description` entry to your Info.plist file (`<Your_App_Folder>/Platforms/iOS/Info.plist`) with the reason why your app requires camera access (e.g. "To iProov you in order to verify your identity.")
-
-### Canceling a claim
-
-Under normal circumstances, the user will be in control of the completion of the claim, i.e. they will either complete the claim, or use the close button to cancel. In some cases, you (the integrator) may wish to cancel the iProov claim programmatically, for example in response to a timeout or change of conditions in your app.
-
-To cancel an ongoing claim, you first need to hold a reference to the `IProovWrapper` object and you can then call `Cancel()` on it.
-
-```csharp
-IProovWrapper wrapper = new IProovWrapper();
-IProovListener listener = new IProovListener();
-var options = new IProovOptions();
-
-wrapper.LaunchIProov(token, "wss://eu.rp.secure.iproov.me/ws", listener, options);
-
-// Example - cancel the wrapper session after 10 sec
-System.Timers.Timer timer = new System.Timers.Timer(10000);
-timer.Elapsed += (sender, e) => 
-{
-    wrapper.Cancel(); // Will return true if the wrapper session was successfully canceled
-};
-timer.Enabled = true;
-```
-
-## Options
-
-The `Options` class allows iProov to be customized in various ways. These can be specified by passing an instance of `IProovOptions` in the `LaunchIProov()` method.
-
-Most of these options are common to both Android and iOS, however, there are some options that are platform-specific.
-
-For full documentation, please read the respective [iOS](https://github.com/iProov/ios#options) and [Android](https://github.com/iProov/android#customize-the-user-experience) native SDK documentation.
-
-A summary of the support for the various SDK options in **iProov.NET.MAUI** is provided below. All options are nullable and any options not set will default to their platform-defined default value.
-
-| Option | Type | iOS | Android |
-|---|---|---|---|
-| `filter` | `Filter?` [(See filter options)](#filter-options)| ✅ | ✅ |
-| `titleTextColor` | `Color?` | ✅ | ✅ |
-| `promptTextColor` | `Color?` | ✅ | ✅ |
-| `closeButtonTintColor` | `Color?` | ✅ | ✅ |
-| `closeButtonImage` | `byte[]?` | ✅ | ✅ |
-| `title` | `string?` | ✅ | ✅ |
-| `fontPath` | `string?` | ✅  | ✅ |
-| `logoImage` | `byte[]?` | ✅ | ✅ |
-| `promptBackgroundColor` | `Color?` | ✅ | ✅ |
-| `promptRoundedCorners` | `bool?` | ✅ | ✅ |
-| `surroundColor` | `Color?` | ✅ | ✅ |
-| `certificates` | `IList<string>?` | ✅ | ✅ |
-| `timeout` | `int?` | ✅ | ✅ |
-| `enableScreenshots` | `bool?` |  | ✅ |
-| `orientation` | `Orientation?` |  | ✅ |
-| `headerBackgroundColor` | `Color?` | ✅ | ✅ |
-| `disableExteriorEffects` | `bool?` | ✅ | ✅ |
-| `stringsTable` | `string?` | ✅ | |
-| `stringsBundle` | `string?` | ✅ | |
-|**`genuinePresenceAssurance`** | `GenuinePresenceAssurance?` |  |  |
-| ↳ `readyOvalStrokeColor` | `Color?` | ✅ | ✅ |
-| ↳ `notReadyOvalStrokeColor` | `Color?` | ✅ | ✅ |
-| ↳ `controlYPosition` | `bool?` | ✅ | ✅ |
-| ↳ `controlXPosition` | `bool?` | ✅ | ✅ |
-| ↳ `scanningPrompts` | `bool?` | ✅ | ✅ |
-|**`livenessAssurance`** | `LivenessAssurance?` |  |  |
-| ↳ `ovalStrokeColor` | `Color?` | ✅ | ✅ |
-| ↳ `completedOvalStrokeColor` | `Color?` | ✅ | ✅ |
-
-### Certificate Pinning
-
-If you are using your own reverse-proxy, you will need to use this option to pin to your own certificates.
-
-Certificates should be passed as a `String`, which is base64-encoded SHA-256 hash of a certificate's Subject Public Key Info. You can load a certificate as follows:
-
-```csharp
-options.certificates = new List<String>{"O8qZKEXWWkMPISIpvB7DUow++JzIW2g+k9z3U/l5V94=", "Sc7wL4FfOw8ued5w3JOSzu5MzB471PfqdyN4hnMYbX4="}
-```
-
-To get Subject Public Key Info from a `.crt`, use the following command:
-
-```sh
-$ openssl x509  -in cert.crt -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
-```
-
-To get Subject Public Key Info from a `.der`, use the following command:
-
-```sh
-$ openssl x509 -inform der -in cert.der -pubkey -noout | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64
-```
-
-When multiple certificates are passed, as long as the server matches **any** of the certificates, the connection will be allowed. Pinning is performed against the **whole** of the certificate.
-
-### Filter Options
-
-The SDK supports two different camera filters:
-
-#### `LineDrawingFilter`
-
-`LineDrawingFilter` is iProov's traditional "canny" filter, which is available in 3 styles: `.Shaded` (default), `.Classic` and `.Vibrant`.
-
-The `foregroundColor` and `backgroundColor` can also be customized.
-
-Example:
-
-```csharp
-var options = IProovOptions();
-
-options.filter = new IProovOptions.LineDrawingFilter(
-                style: LineDrawingFilterStyle.Shaded,
-                foregroundColor: Colors.Black,
-                backgroundColor: Colors.White);
-```
-
-#### `NaturalFilter`
-
-`NaturalFilter` provides a more direct visualization of the user's face and is available in 2 styles: `.Clear` (default) and `.Blur`.
-
-Example:
-
-```csharp
-var options = IProovOptions();
-
-options.filter = new IProovOptions.NaturalFilter(style: NaturalFilterStyle.Clear);
-```
-
-> **Note**: `NaturalFilter` is available for Liveness Assurance claims only. Attempts to use `NaturalFilter` for Genuine Presence Assurance claims will result in an error.
-
-## Failures and Errors
-
-### Failures
-
-Failures occur when the user's identity could not be verified. A failure means that the capture was successfully received and processed by the server, which returned a result. Crucially, this differs from an error, where the capture itself failed due to a system failure.
-
-The failure results in an `IProovFailureResult`, which contains a property named `reasons` that is a list of `IProovFailureReason`. An `IProovFailureReason` has the following properties:
-    - `reason` - Of type `FailureReason`, which is an enum that represents the feedback code.
-    - `description` - `string?` that contains a human readable description of the reason of failure. Only returned when running on iOS.
-	- `descriptionId` - `int` with the string resource ID for the human readable description of the reason of failure. Only returned when running on Android.
-	
->You should present the `description` to the user as it may provide an informative hint for the user to increase their chances of iProoving successfully next time.
-
-The available `FailureReason` values for claims are as follows:
-
-| `FailureReason` value | `description` (English)                | GPA | LA |
-|-----------------------|----------------------------------------|---|---|
-| `Unknown`             | Try again                              | ✅ | ❌ |
-| `TooMuchMovement`   | Keep still                             | ✅ | ❌ |
-| `TooBright`          | Move somewhere darker                  | ✅ | ❌ |
-| `TooDark`            | Move somewhere brighter                | ✅ | ❌ |
-| `MisalignedFace`     | Keep your face in the oval             | ✅ | ❌ |
-| `FaceTooFar`        | Move your face closer to the screen    | ✅ | ❌ |
-| `FaceTooClose`      | Move your face farther from the screen | ✅ | ❌ |
-| `Sunglasses`          | Remove sunglasses                      | ✅ | ❌ |
-| `ObscuredFace`       | Remove any face coverings              | ✅ | ✅ |
-| `EyesClosed`         | Keep your eyes open                    | ✅ | ✅ |
-| `MultipleFaces`      | Ensure only one person is visible      | ✅️ | ✅️ |
-| `BackgroundIssue`    | Move to a different location with a neutral background. | ⚠️ | ✅ |
-| `DeviceIssue`        | Try a different device. | ⚠️ | ✅ |
-| `Eyewear`             | Remove your eyewear. | ⚠️ | ✅ |
-| `FaceNotFound`      | Align your face in the oval and then try to keep still. | ⚠️ | ✅ |
-| `FramesBlurry`       | Align your face in the oval and then try to keep still. Please try again. | ⚠️ | ✅ |
-| `MotionIssue`        | Try a different device. | ⚠️ | ✅ |
-| `LightingIssues`     | Make sure your face is well lit and free from glare. | ⚠️ | ✅ |
-| `Rejected`            | Transaction could not be completed. | ⚠️ | ✅ |
-| `SystemError`        | System error. | ⚠️ | ✅ |
-| `Timeout`             | System timeout. | ⚠️ | ✅ |
-| `UserNotFound`      | Transaction could not be completed. | ⚠️ | ✅ |
-| `DeviceRestart`      | Please restart your device and try again. | ⚠️ | ✅ |
-| `ProcessingFault`    | Please try again. | ⚠️ | ✅ |
-
-Key: ✅ = will be returned, ❌ = will not be returned, ⚠️ = may be returned in the future
-
-These are not an indication of tests being performed but only whether reasons of failure are reported.
-
-### Errors
-
-All errors from the native SDKs are re-mapped to `IProovException` exceptions:
-
-| Exception                         | iOS | Android | Description                                                                                                                      |
-| --------------------------------- | --- | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `CaptureAlreadyActiveException`   | ✅   | ✅       | An existing iProov capture is already in progress. Wait until the current capture completes before starting a new one.           |
-| `NetworkException`                    | ✅   | ✅       | An error occurred with the video streaming process. Consult the `message` value for more information.                            |
-| `CameraPermissionException`           | ✅   | ✅       | The user disallowed access to the camera when prompted. You should direct the user to re-enable camera access.                   |
-| `ServerException`                 | ✅   | ✅       | A server-side error/token invalidation occurred. The associated `message` will contain further information about the error.      |
-| `UnexpectedErrorException`        | ✅   | ✅       | An unexpected and unrecoverable error has occurred. These errors should be reported to iProov for further investigation.         |
-| `UnsupportedDeviceException`         |✅   | ✅         | Device is not supported.|
-| `ListenerNotRegisteredException`  |     | ✅       | The SDK was launched before a listener was registered.                                                                           |
-| `MultiWindowUnsupportedException` |     | ✅       | The user attempted to iProov in split-screen/multi-screen mode, which is not supported.                                          |
-| `CameraException`                 |     | ✅       | An error occurred acquiring or using the camera. This could happen when a non-phone is used with/without an external/USB camera. |
-| `InvalidOptionsException`         |     | ✅       | An error occurred when trying to apply your options.|
-| `UserTimeoutException`         |✅   |          | The user has taken too long to complete the claim.|
-
+> **Warning**: The example app uses the API client to directly fetch tokens on-device and this is inherently insecure. Production implementations of iProov should always obtain tokens securely from a server-to-server call.
 
 ## API Client
 
-The .NET API client provides a convenient wrapper to call iProov's REST API v2 from a .NET Standard Library. It is a useful tool to assist with testing, debugging and demos, but should not be used in production mobile apps. You could also adapt this code to run on your back-end to perform server-to-server calls.
+The [APIClient](APIClient) project is a simple wrapper for iProov's REST API v2, written in C#, which the example app uses to get tokens. It needs your API secret, so use it only for testing, debugging and demos, never in a production app. You could also adapt it to run on your back-end for server-to-server calls.
 
-> ⚠️ **SECURITY NOTICE:** Use of the .NET API Client requires providing it with your API secret. **You should never embed your API secret within a production app.**
+It supports the following functionality:
 
-### Functionality
-
-The .NET API Client supports the following functionality:
-
-- `GetToken()` - Get an enrol/verify token
+- `GetToken()` - Get an enrol/verify token.
 - `EnrolPhoto()` - Perform a photo enrolment (either from an electronic or optical image). The image must be provided in JPEG format.
 - `Validate()` - Validate an existing token against the provided User ID.
 - `EnrolPhotoAndGetVerifyToken()` - A convenience method which first gets an enrolment token, then enrols the photo against that token, and then gets a verify token for the user to iProov against.
 
-### Installation
+## Help & Support
 
-To add the .NET API Client to your project, add it as a sub-project to your solution, and then [add a reference](https://docs.microsoft.com/en-us/visualstudio/mac/managing-references-in-a-project?view=vsmac-2019) to the **APIClient** project from your app project.
+See the [release notes](https://github.com/iProov/dotnet-maui/releases) for the changes in each version.
 
-You can now import the API Client with `using iProov.APIClient;`.
-
-### Usage examples
-
-We will now run through a couple of common use-cases with the API Client. All the API Client source code is provided, so you can understand how it works and adapt it accordingly.
-
-#### Getting a token
-
-The most basic thing you can do with the API Client is get a token to either enrol or verify a user, using either iProov's Genuine Presence Assurance or Liveness Assurance.
-
-This is achieved as follows:
-
-```csharp
-ApiClient apiClient = new ApiClient(
-            "https://beta.rp.secure.iproov.me/api/v2",
-            "{{ apiKey }}",
-            "{{ secret }}",
-            "com.iproov.ExampleAppMAUI");
-
-var token = await apiClient.GetToken(AssuranceType.GenuinePresence, ClaimType.Enrol, "{{ user id }}");
-```
-
-You can then launch the iProov SDK with this token.
-
-## Sample code
-
-For a simple iProov experience that is ready to run out-of-the-box, check out the [ExampleAppMAUI project](https://github.com/iProov/dotnet-maui/tree/master/ExampleAppMAUI) for a .NET MAUI app that uses `iProov.NET.MAUI` and also makes use of the .NET API Client.
-
-### Usage
-
-1. Rename `Credentials.example.cs` to `Credentials.cs` and update with your Base URL, API Key and Secret. You can obtain these credentials from [iProov Portal](https://portal.iproov.com/)
-2. Open the ExampleAppMAUI solution in Visual Studio / VS Code.
-3. Restore NuGet Packages to ensure all NuGet packages are ready for usage.
-4. Run the ExampleAppMAUI project on a supported iOS or Android device.
-
-> NOTE: iProov is not supported on the iOS or Android simulator, you must use a physical device in order to iProov.
+For help with integrating the SDK, please contact [support@iproov.com](mailto:support@iproov.com).

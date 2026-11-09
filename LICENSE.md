@@ -7,7 +7,7 @@ Please refer to the iOS Biometrics SDK license [here](https://github.com/iProov/
 Please refer to the Android Biometrics SDK license [here](https://github.com/iProov/android/blob/master/LICENSE.md).
 
 # iProov.NET.MAUI
-Please refer to the aformentioned [Android](https://github.com/iProov/android/blob/master/LICENSE.md) and [iOS](https://github.com/iProov/ios/blob/master/LICENSE.md) licenses.
+Please refer to the aforementioned [Android](https://github.com/iProov/android/blob/master/LICENSE.md) and [iOS](https://github.com/iProov/ios/blob/master/LICENSE.md) licenses.
 
 # API Client/Sample Code
 
