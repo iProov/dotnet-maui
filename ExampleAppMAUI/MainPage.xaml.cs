@@ -34,7 +34,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
 	{
         if(!AreCredentialsSet())
         {
-            await DisplayAlert("Error", "Set your API_KEY and SECRET in the Credentials file", "Understood");
+            await DisplayAlertAsync("Error", "Set your API_KEY and SECRET in the Credentials file", "Understood");
             return;
         }
 
@@ -46,7 +46,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
             Credentials.API_CLIENT_URL,
             Credentials.API_KEY,
             Credentials.SECRET,
-            "com.iproov.MAUIExample");
+            "com.iproov.MAUIWrapperExampleApp");
 
 			try
 			{
@@ -55,19 +55,18 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
             }
             catch (Exception exception)
 			{
-                await DisplayAlert("Failed to get token", $"{exception.Message}", "OK");
+                await DisplayAlertAsync("Failed to get token", $"{exception.Message}", "OK");
             }
 
         } else
 		{
-            await DisplayAlert("Error", "You need to provide a user id", "OK");
+            await DisplayAlertAsync("Error", "You need to provide a user id", "OK");
 		}
     }
 
 	private void launchIProov(string token)
 	{
         DisableControlElements();
-        ClaimFrame.Source = null;
 
         var options = new IProovOptions();
 
@@ -82,7 +81,7 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
     {
         // Set your desired options here
 
-        options.enableScreenShots = false;
+        options.enableScreenshots = false;
         options.closeButtonTintColor = Colors.Red;
         options.closeButtonImage = ImageToByteArrayAsync("ExampleAppMAUI.Resources.Images.custom_back.png");
         options.disableExteriorEffects = false;
@@ -97,12 +96,16 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
         options.livenessAssurance = new IProovOptions.LivenessAssurance(
             ovalStrokeColor: Colors.Beige,
             completedOvalStrokeColor: Colors.DarkGreen);
-        options.genuinePressenceAssurance = new IProovOptions.GenuinePressenceAssurance(
+        options.genuinePresenceAssurance = new IProovOptions.GenuinePresenceAssurance(
             notReadyColor: Colors.LightBlue,
             readyColor: Colors.YellowGreen,
             controlYPosition: true,
             controlXPosition: true,
-            scanningPrompts: true);
+            scanningPrompts: true,
+            accessibility: new IProovOptions.GenuinePresenceAssurance.Accessibility(
+                isColorEnabled: true,
+                isSoundEnabled: true,
+                isVibrationEnabled: true));
 
     }
 
@@ -148,23 +151,20 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
 
     public void OnCanceled(Canceler canceler)
     {
-        DisplayAlert("OnCanceled", $"Canceled by {canceler}", "OK");
+        _ = DisplayAlertAsync("OnCanceled", $"Canceled by {canceler}", "OK");
         ClaimEnded();
     }
 
     public void OnError(IProovException exception)
     {
-        DisplayAlert("OnError", $"Exception: {exception.GetType}\nTitle: {exception.title} // Message: {exception.message}", "OK");
+        _ = DisplayAlertAsync("OnError", $"Exception: {exception.GetType().Name}\nTitle: {exception.title} // Message: {exception.message}", "OK");
         ClaimEnded();
     }
 
     public void OnFailure(IProovFailureResult failure)
     {
         var displayText = GetFailureReasonsAsString(failure.reasons);
-        DisplayAlert("OnFailure", displayText, "OK");
-        if (failure.frame != null)
-            LoadFrameResult(failure.frame);
-
+        _ = DisplayAlertAsync("OnFailure", displayText, "OK");
         ClaimEnded();
     }
 
@@ -174,14 +174,9 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
         UpdateProgress(progress);
     }
 
-    public void OnSuccess(byte[]? frame)
+    public void OnSuccess()
     {
-        var frameMssg = frame == null ? "No" : "A";
-        DisplayAlert("OnSuccess", $"{frameMssg} frame was returned", "OK");
-
-        if (frame != null)
-            LoadFrameResult(frame);
-
+        _ = DisplayAlertAsync("OnSuccess", "The claim passed", "OK");
         ClaimEnded();
     }
     // -------------------------
@@ -252,12 +247,6 @@ public partial class MainPage : ContentPage, IProovWrapper.IStateListener, IProo
         ClaimTypeVerticalStackLayout.IsEnabled = false;
         AssuranceTypeVerticalStackLayout.IsEnabled = false;
         LaunchButton.IsEnabled = false;
-    }
-
-    private void LoadFrameResult(byte[] frame)
-    {
-        MemoryStream stream = new MemoryStream(frame);
-        ClaimFrame.Source = ImageSource.FromStream(() => stream);
     }
 
     private static byte[] ImageToByteArrayAsync(string path)
